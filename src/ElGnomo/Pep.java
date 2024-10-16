@@ -87,6 +87,12 @@ public class Pep {
 
 	public void moverDerecha(Entorno e) {
 		x += factorDesplazamiento;
+	} 
+	public void saltar() {
+    		if (vivo && !saltando && !estaCayendo()) {
+        		saltando = true;
+        	velocidadSalto = VELOCIDAD_SALTO;
+    		}
 	}
 	public void caer() {
 		// y += factorDesplazamiento+impulso*3/2;
@@ -162,7 +168,21 @@ public class Pep {
 	        }
 	    }
 	    
-
+public boolean aterrizaSobreIsla(Isla[] islas) {
+    for (Isla isla : islas) {
+        if ((x + ancho / 2 >= isla.getX() - isla.getAncho() / 2) &&
+            (x - ancho / 2 <= isla.getX() + isla.getAncho() / 2) &&
+            (y + alto / 2 >= isla.getY() - isla.getAlto() / 2) &&
+            (y + alto / 2 <= isla.getY() + isla.getAlto() / 2) &&
+            cayendo) {
+            y = isla.getY() - alto / 2; // Asegúrate de que Pep no atraviese la isla
+            cayendo = false; // Deja de caer
+            saltando = false; // Deja de saltar
+            return true;
+        }
+    }
+    return false;
+}
 
 
 }
