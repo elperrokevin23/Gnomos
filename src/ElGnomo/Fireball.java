@@ -16,7 +16,7 @@ public class Fireball {
         this.y = y;
         this.angulo = angulo;
         this.moviendoDerecha = moviendoDerecha;
-        this.velocidad = 6; // Ajusta la velocidad de la bola de fuego
+        this.velocidad = 1.5; // Ajusta la velocidad de la bola de fuego
     }
 
     // Método para mover la bola de fuego
