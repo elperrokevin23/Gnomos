@@ -14,8 +14,6 @@ public class Pep {
 	private int ancho;
 	private int alto;
 	static boolean saltando = false;
-	private double velocidadActualSalto = 0;
-    private static final double VELOCIDAD_SALTO = 15;
     private int anguloFireball;
     private String direccion;
     private ArrayList<Fireball> fireballs;
@@ -23,7 +21,7 @@ public class Pep {
 	// private double impulso;
 	// private double limiteDeSalto;
 	private boolean derecha;
-	private int gravedad = 5;
+	private double gravedad = 1.3;
 	private Image imagenDerecha;
 	private Image imagenIzquierda;
 	private Image imagenMuerto;
@@ -47,7 +45,6 @@ public class Pep {
         this.fireballs = new ArrayList<>();
         this.imagenDerecha = Herramientas.cargarImagen("stepep.png");
         this.imagenIzquierda = Herramientas.cargarImagen("stepe.png");
-        this.imagenMuerto = Herramientas.cargarImagen("stepe.png");
         cayendo = false;
         
 	}
@@ -74,10 +71,9 @@ public class Pep {
 					0.3);
 
 		else {
-			if (vidas > 0) {
-				e.dibujarImagen(imagenMuerto, x, y, 0, 1.0);
+				e.dibujarImagen(derecha ? imagenDerecha : imagenIzquierda, x, y, 0,
+						0.3);
 				e.cambiarFont("Arial", 18, Color.GREEN);
-			}
 		}
 	}
 
@@ -91,7 +87,6 @@ public class Pep {
 	public void saltar() {
     		if (vivo && !saltando && !estaCayendo()) {
         		saltando = true;
-        	velocidadSalto = VELOCIDAD_SALTO;
     		}
 	}
 	public void caer() {
@@ -183,6 +178,25 @@ public boolean aterrizaSobreIsla(Isla[] islas) {
     }
     return false;
 }
+public boolean chocoAlgunEnemigo(Tortugas[] tortuga) {
+	for (Tortugas e : tortuga) {
+		if ((x + ancho / 3 >= e.getX() - e.getAncho() / 2)
+				&& (x - ancho / 3 <= e.getX() + e.getAncho() / 2)
+				&& (y + alto / 3 <= e.getY() + e.getAlto() / 2)
+				&& (y + alto / 3 >= e.getY() - e.getAlto() / 2)
+				&& e.estaVivo()) {
+			return true;
+		}
+	}
+	return false;
+}
+public void morir(Entorno e) {
+    if (vivo) {
+        // Esta parte solo debe afectar a la variable 'vivo' y la posición de Pep, no su tamaño
+        vivo = false;
+    }
+}
+
 
 
 }
