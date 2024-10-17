@@ -63,10 +63,10 @@ public class Gnomos {
 
 public void mover() {
 	if (moviendoseALaDerecha) {
-		x += factorDesplazamiento;
+		x -= factorDesplazamiento;
 	}
 	else {
-		x -= factorDesplazamiento;
+		x += factorDesplazamiento;
 	}
 }
 public void cambiarDireccion() {
@@ -169,6 +169,13 @@ public void cambiarDireccion() {
 			cayendo = true;
 		}
 	}
+	public boolean chocoIzquierda(Entorno e) {
+		return x - ancho / 2 <= 0;
+	}
+
+	public boolean chocoDerecha(Entorno e) {
+		return x + ancho / 2 >= e.ancho();
+	}
 
 	public void dibujar(Entorno entorno) {
 		if (estaVivo()) {
@@ -176,3 +183,4 @@ public void cambiarDireccion() {
     }
 	}
 }
+
