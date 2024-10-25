@@ -21,22 +21,24 @@ public class Gnomos {
 	private boolean cayendo;
 	private int direccion;
 	private boolean moviendoseALaDerecha;
+	private boolean cambioDireccionHecho; 
 
 	public Gnomos(double x, double y, int ancho, int alto, String rutaImagen) {
 		this.x = x;
 		this.y = y;
 		this.ancho = ancho;
 		this.alto = alto;
-		this.imagen = Herramientas.cargarImagen("gnomo3.png");
+		this.imagen = Herramientas.cargarImagen("imagenes/gnomo3.png");
 		this.puntos = 100;
 		this.random = new Random();
-		this.factorDesplazamiento = 2.0;
+		this.factorDesplazamiento = 0.7;
 	    this.ultimoCambioDireccion = System.currentTimeMillis(); 
 	    this.vivo = true;
 	    this.gravedad = 5;
 	    cayendo = false;
 	    this.direccion = 1;
 	    this.moviendoseALaDerecha = true; // Inicialmente moviéndose a la derecha
+	    cambioDireccionHecho = false;
 	}
 
 	public Gnomos(int i, int j, int k, int l, int m, boolean b, int tiempoCongelado) {
@@ -63,14 +65,15 @@ public class Gnomos {
 
 public void mover() {
 	if (moviendoseALaDerecha) {
-		x -= factorDesplazamiento;
+		x += factorDesplazamiento;
 	}
 	else {
-		x += factorDesplazamiento;
+		x -= factorDesplazamiento;
 	}
 }
 public void cambiarDireccion() {
-    moviendoseALaDerecha = !moviendoseALaDerecha; // Invierte la dirección
+    moviendoseALaDerecha = random.nextBoolean(); // Invierte la dirección
+    
 }
 
 
@@ -84,6 +87,7 @@ public void cambiarDireccion() {
 	}
 
 	public void reSpawn() {
+		x = 400;
 		y = 0;
 	}
 
@@ -95,11 +99,11 @@ public void cambiarDireccion() {
 	public boolean estaSobreAlgunaIsla(Isla[] islas) {
 		for (int z = 0; z < islas.length; z++) {
 			if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2)
-					&& (x - +ancho / 2 <= islas[z].getX() + islas[z].getAncho()
-							/ 2)
-					&& (y + alto / 2 <= islas[z].getY() + islas[z].getAlto()
+					&& (x - ancho / 2 <= islas[z].getX() + islas[z].getAncho()
 							/ 2)
 					&& (y + alto / 2 >= islas[z].getY() - islas[z].getAlto()
+							/ 2)
+					&& (y - alto / 2 <= islas[z].getY() + islas[z].getAlto()
 							/ 2)) {
 				return true;
 			}
@@ -109,11 +113,11 @@ public void cambiarDireccion() {
 	public void cambiarDireccionSiTocaIsla(Isla[] islas) {
 		for (int z = 0; z < islas.length; z++) {
 			if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2)
-					&& (x - +ancho / 2 <= islas[z].getX() + islas[z].getAncho()
-							/ 2)
-					&& (y + alto / 2 <= islas[z].getY() + islas[z].getAlto()
+					&& (x - ancho / 2 <= islas[z].getX() + islas[z].getAncho()
 							/ 2)
 					&& (y + alto / 2 >= islas[z].getY() - islas[z].getAlto()
+							/ 2)
+					&& (y - alto / 2 <= islas[z].getY() + islas[z].getAlto()
 							/ 2)) {
 				 cambiarDireccion();
 			}
@@ -138,8 +142,9 @@ public void cambiarDireccion() {
 		vivo = false;
 	}
 
-	public boolean fueChocadoPorUnEnemigo(Gnomos[] enemigos) {
-		for (Gnomos h : enemigos) {
+
+	public boolean fueChocadoPorUnEnemigo(Tortugas[] tortuga) {
+		for (Tortugas h : tortuga) {
 			if (this.estaVivo() && h.estaVivo()
 					&& (x >= h.getX() - h.getAncho() / 2)
 					&& (x <= h.getX() + h.getAncho() / 2)
@@ -150,18 +155,7 @@ public void cambiarDireccion() {
 		}
 		return false;
 	}
-	public boolean chocoFireball(Fireball[] fireballs) {
-		for (int x = 0; x < fireballs.length; x++) {
-			if (fireballs[x] != null
-					&& fireballs[x].getX() <= this.x + this.ancho / 2
-					&& fireballs[x].getX() >= this.x - this.ancho / 2
-					&& (fireballs[x].getY() >= y - alto / 2 && fireballs[x].getY() <= y
-							+ alto / 2)) {
-				return true;
-			}
-		}
-		return false;
-	}
+
 	public void caer() {
 		// y += factorDesplazamiento+impulso*3/2;
 		if (vivo) {
@@ -171,6 +165,11 @@ public void cambiarDireccion() {
 	}
 	public boolean chocoIzquierda(Entorno e) {
 		return x - ancho / 2 <= 0;
+	}
+	public Gnomos generarNuevoGnomo() {
+	    double nuevaX = 500; // Ajusta el ancho según el entorno
+	    double nuevaY = -500; // Ajusta el alto según el entorno
+	    return new Gnomos(nuevaX, nuevaY,10,10,"gnomo3.png");
 	}
 
 	public boolean chocoDerecha(Entorno e) {
@@ -183,4 +182,3 @@ public void cambiarDireccion() {
     }
 	}
 }
-
