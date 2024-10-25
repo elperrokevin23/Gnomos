@@ -6,28 +6,33 @@ import java.util.ArrayList;
 
 import entorno.Entorno;
 import entorno.Herramientas;
-import entorno.Herramientas;
 
 public class Pep {
 	private double x;
 	private double y;
 	private int ancho;
 	private int alto;
-	static boolean saltando = false;
+	private boolean saltando;
     private int anguloFireball;
-    private String direccion;
     private ArrayList<Fireball> fireballs;
 	private double factorDesplazamiento;
 	// private double impulso;
 	// private double limiteDeSalto;
 	private boolean derecha;
-	private double gravedad = 1.3;
+	private double gravedad = 2.5;
 	private Image imagenDerecha;
 	private Image imagenIzquierda;
-	private Image imagenMuerto;
 	private int vidas;
 	private boolean vivo;
 	private boolean cayendo;
+	private Isla[] islas;
+	private boolean apoyado;
+	private int contadorSalto;
+	private int tiempoSalto;
+	private long tiempoInmortalInicio;
+	private static final long DURACION_INMORTAL = 5000;
+	private boolean inmortal;
+	
 	
 
 	public Pep(double x, double y, int ancho, int alto, double f,
@@ -40,12 +45,17 @@ public class Pep {
 		this.derecha = der;
 		this.vidas = 5;
 		vivo = true;
-        this.direccion = "derecha";
         this.anguloFireball = 0;
         this.fireballs = new ArrayList<>();
-        this.imagenDerecha = Herramientas.cargarImagen("stepep.png");
-        this.imagenIzquierda = Herramientas.cargarImagen("stepe.png");
-        cayendo = false;
+        this.imagenDerecha = Herramientas.cargarImagen("imagenes/stepep.png");
+        this.imagenIzquierda = Herramientas.cargarImagen("imagenes/stepe.png");
+        this.contadorSalto = 0;
+        this.apoyado = false;
+        this.cayendo = false;
+        this.saltando = false;
+        this.inmortal = false;
+        this.tiempoInmortalInicio = 0;
+
         
 	}
 
@@ -70,12 +80,19 @@ public class Pep {
 			e.dibujarImagen(derecha ? imagenDerecha : imagenIzquierda, x, y, 0,
 					0.3);
 
-		else {
-				e.dibujarImagen(derecha ? imagenDerecha : imagenIzquierda, x, y, 0,
-						0.3);
-				e.cambiarFont("Arial", 18, Color.GREEN);
-		}
 	}
+	public void activarInmortalidad() {
+        this.inmortal = true;
+        this.tiempoInmortalInicio = System.currentTimeMillis();
+    }
+	public void actualizarInmortalidad() {
+        if (this.inmortal && (System.currentTimeMillis() - this.tiempoInmortalInicio) > DURACION_INMORTAL) {
+            this.inmortal = false; // Se desactiva la inmortalidad después de 5 segundos
+        }
+    }
+	public boolean esInmortal() {
+        return this.inmortal;
+    }
 
 	public void moverIzquierda(Entorno e) {
 		x -= factorDesplazamiento;
@@ -84,11 +101,8 @@ public class Pep {
 	public void moverDerecha(Entorno e) {
 		x += factorDesplazamiento;
 	} 
-	public void saltar() {
-    		if (vivo && !saltando && !estaCayendo()) {
-        		saltando = true;
-    		}
-	}
+	
+	
 	public void caer() {
 		// y += factorDesplazamiento+impulso*3/2;
 		if (vivo) {
@@ -99,12 +113,30 @@ public class Pep {
 	public boolean estaCayendo() {
 		return cayendo;
 	}
-	public boolean aterrizaSobreViga(boolean sobre) {
-		if (sobre && cayendo) {
+	public void caerSubir() {
+		final double velocidad_caida = 183.0;
+		final double velocidad_salto = 85.0;
+		final int limite_salto = 0;
+
+		// Verificar si está cayendo
+		if (!apoyado && !saltando) {
+			cayendo = true;
+			y += velocidad_salto;
+		} else {
 			cayendo = false;
-			return true;
 		}
-		return false;
+
+		// Ejecutar salto
+		if (saltando) {
+			y -= velocidad_caida;
+			contadorSalto++;
+			// Terminar salto si excede el límite
+			if (this.contadorSalto > limite_salto) {
+				saltando = false;
+				cayendo = true;
+				contadorSalto = 0;
+			}
+		}
 	}
 
 
@@ -148,7 +180,7 @@ public class Pep {
 	}
 	public void lanzarBola() {
         this.anguloFireball = (derecha) ? 0 : 180; // Define el ángulo si es necesario
-        Fireball fireball = new Fireball(this.x, this.y, anguloFireball, derecha);
+        Fireball fireball = new Fireball(this.x, this.y + 10, anguloFireball, derecha);
         fireballs.add(fireball); // Añade la nueva bola de fuego a la lista
     }
 	 public void actualizarFireballs() {
@@ -162,6 +194,24 @@ public class Pep {
 	            fireball.dibujar(e); // Dibuja cada bola de fuego
 	        }
 	    }
+	    public boolean isApoyado() {
+			return apoyado;
+		}
+	    public boolean isSaltando() {
+			return saltando;
+		}
+	    public boolean isCayendo() {
+			return cayendo;
+		}
+	    public void setSaltando(boolean saltando) {
+			this.saltando = saltando;
+		}
+	    public void setCayendo(boolean cayendo) {
+			this.cayendo = cayendo;
+		}
+	    public void setApoyado(boolean apoyado) {
+			this.apoyado = apoyado;
+		}
 	    
 public boolean aterrizaSobreIsla(Isla[] islas) {
     for (Isla isla : islas) {
@@ -173,6 +223,7 @@ public boolean aterrizaSobreIsla(Isla[] islas) {
             y = isla.getY() - alto / 2; // Asegúrate de que Pep no atraviese la isla
             cayendo = false; // Deja de caer
             saltando = false; // Deja de saltar
+            apoyado = true;
             return true;
         }
     }
@@ -189,6 +240,13 @@ public boolean chocoAlgunEnemigo(Tortugas[] tortuga) {
 		}
 	}
 	return false;
+}
+public Fireball dispararFireball() {
+    // Ajusta el valor de "y" para disparar desde una posición más baja
+    double alturaDisparo = this.y + 30;  // Baja el disparo 30 píxeles desde la posición de Pep
+
+    // Crea un nuevo Fireball hacia la derecha o izquierda
+    return new Fireball(this.x, alturaDisparo, 0, this.derecha);
 }
 public void morir(Entorno e) {
     if (vivo) {
