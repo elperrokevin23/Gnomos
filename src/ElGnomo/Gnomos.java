@@ -6,6 +6,7 @@ import entorno.Herramientas;
 import java.util.Random;
 
 public class Gnomos {
+	
 	private double x;
 	private double y;
 	private int ancho;
@@ -21,24 +22,26 @@ public class Gnomos {
 	private boolean cayendo;
 	private int direccion;
 	private boolean moviendoseALaDerecha;
-	private boolean cambioDireccionHecho; 
+	private boolean estaEnIslaInferior;
+	
+	private static Random rand = new Random();
 
 	public Gnomos(double x, double y, int ancho, int alto, String rutaImagen) {
 		this.x = x;
 		this.y = y;
 		this.ancho = ancho;
 		this.alto = alto;
-		this.imagen = Herramientas.cargarImagen("imagenes/gnomo3.png");
+		this.imagen = Herramientas.cargarImagen("gnomo.png");
 		this.puntos = 100;
 		this.random = new Random();
-		this.factorDesplazamiento = 0.7;
+		this.factorDesplazamiento = 2.0;
 	    this.ultimoCambioDireccion = System.currentTimeMillis(); 
 	    this.vivo = true;
 	    this.gravedad = 5;
 	    cayendo = false;
 	    this.direccion = 1;
-	    this.moviendoseALaDerecha = true; // Inicialmente moviéndose a la derecha
-	    cambioDireccionHecho = false;
+	    this.moviendoseALaDerecha = rand.nextBoolean(); // movimiento random del gnomo
+	    this.estaEnIslaInferior = false;
 	}
 
 	public Gnomos(int i, int j, int k, int l, int m, boolean b, int tiempoCongelado) {
@@ -65,15 +68,14 @@ public class Gnomos {
 
 public void mover() {
 	if (moviendoseALaDerecha) {
-		x += factorDesplazamiento;
+		x -= factorDesplazamiento;
 	}
 	else {
-		x -= factorDesplazamiento;
+		x += factorDesplazamiento;
 	}
 }
 public void cambiarDireccion() {
-    moviendoseALaDerecha = random.nextBoolean(); // Invierte la dirección
-    
+    moviendoseALaDerecha = !moviendoseALaDerecha; // Invierte la dirección
 }
 
 
@@ -86,10 +88,9 @@ public void cambiarDireccion() {
 		return y > e.alto();
 	}
 
-	public void reSpawn() {
-		x = 400;
+	/* public void reSpawn() {
 		y = 0;
-	}
+	} */
 
 
 	public boolean estaVivo() {
@@ -99,27 +100,23 @@ public void cambiarDireccion() {
 	public boolean estaSobreAlgunaIsla(Isla[] islas) {
 		for (int z = 0; z < islas.length; z++) {
 			if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2)
-					&& (x - ancho / 2 <= islas[z].getX() + islas[z].getAncho()
+					&& (x - +ancho / 2 <= islas[z].getX() + islas[z].getAncho()
+							/ 2)
+					&& (y + alto / 2 <= islas[z].getY() + islas[z].getAlto()
 							/ 2)
 					&& (y + alto / 2 >= islas[z].getY() - islas[z].getAlto()
-							/ 2)
-					&& (y - alto / 2 <= islas[z].getY() + islas[z].getAlto()
 							/ 2)) {
+				estaEnIslaInferior = islas[z].esIslaInferior();
 				return true;
 			}
 		}
 		return false;
 	}
-	public void cambiarDireccionSiTocaIsla(Isla[] islas) {
-		for (int z = 0; z < islas.length; z++) {
-			if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2)
-					&& (x - ancho / 2 <= islas[z].getX() + islas[z].getAncho()
-							/ 2)
-					&& (y + alto / 2 >= islas[z].getY() - islas[z].getAlto()
-							/ 2)
-					&& (y - alto / 2 <= islas[z].getY() + islas[z].getAlto()
-							/ 2)) {
-				 cambiarDireccion();
+	public void cayoSobreUnaIsla(Isla[] islas) {
+		if(cayendo && estaSobreAlgunaIsla(islas)) {
+			cayendo = false;
+			if (rand.nextBoolean()) {
+				cambiarDireccion();
 			}
 		}
 	}
@@ -129,7 +126,7 @@ public void cambiarDireccion() {
 				&& (x <= h.getX() + h.getAncho() / 2)
 				&& (y <= h.getY() + h.getAlto() / 2)
 				&& (y >= h.getY() - h.getAlto() / 2)) {
-			return true;
+			return estaEnIslaInferior;
 		}
 		return false;
 	}
@@ -142,9 +139,8 @@ public void cambiarDireccion() {
 		vivo = false;
 	}
 
-
-	public boolean fueChocadoPorUnEnemigo(Tortugas[] tortuga) {
-		for (Tortugas h : tortuga) {
+	public boolean fueChocadoPorUnEnemigo(Gnomos[] enemigos) {
+		for (Gnomos h : enemigos) {
 			if (this.estaVivo() && h.estaVivo()
 					&& (x >= h.getX() - h.getAncho() / 2)
 					&& (x <= h.getX() + h.getAncho() / 2)
@@ -155,21 +151,31 @@ public void cambiarDireccion() {
 		}
 		return false;
 	}
-
-	public void caer() {
-		// y += factorDesplazamiento+impulso*3/2;
+	public boolean chocoFireball(Fireball[] fireballs) {
+		for (int x = 0; x < fireballs.length; x++) {
+			if (fireballs[x] != null
+					&& fireballs[x].getX() <= this.x + this.ancho / 2
+					&& fireballs[x].getX() >= this.x - this.ancho / 2
+					&& (fireballs[x].getY() >= y - alto / 2 && fireballs[x].getY() <= y
+							+ alto / 2)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public void caer() {		
 		if (vivo) {
 			y += gravedad;
 			cayendo = true;
 		}
 	}
+	
+	public boolean ultimaIslaEsInferior() {
+		return estaEnIslaInferior;
+	}
+	
 	public boolean chocoIzquierda(Entorno e) {
 		return x - ancho / 2 <= 0;
-	}
-	public Gnomos generarNuevoGnomo() {
-	    double nuevaX = 500; // Ajusta el ancho según el entorno
-	    double nuevaY = -500; // Ajusta el alto según el entorno
-	    return new Gnomos(nuevaX, nuevaY,10,10,"gnomo3.png");
 	}
 
 	public boolean chocoDerecha(Entorno e) {
@@ -182,3 +188,4 @@ public void cambiarDireccion() {
     }
 	}
 }
+

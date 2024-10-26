@@ -10,20 +10,14 @@ public class Score {
 		puntos = 0;
 	}
 
-	public void agarrandoGnomo() {
-		puntos += 10;
-	}
-	public void agarraElGnomo() {
-		puntos -= 10;
-	}
-	public void ganador() {
-		puntos = 100;
+	public void sumarPuntos(int pun) {
+		puntos += pun;
 	}
 
 	public void dibujar(Entorno e) {
-		e.cambiarFont("Arial", 32, Color.WHITE);
-		e.escribirTexto("Puntos: " + puntos, 600,
-				100);
+		e.cambiarFont("Arial", 18, Color.WHITE);
+		e.escribirTexto("Puntos: 0" + puntos, e.ancho() * 3 / 4,
+				e.alto() * 9 / 10);
 	}
 
 	public int getScore() {
