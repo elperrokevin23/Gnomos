@@ -22,7 +22,7 @@ public class Pep {
 	private double impulso;
 	private double limiteDeSaltoY;
 	private boolean derecha;
-	private double gravedad = 1.3;
+	private double gravedad = 3;
 	private Image imagenDerecha;
 	private Image imagenIzquierda;
 	private Image imagenMuerto;
@@ -30,6 +30,8 @@ public class Pep {
 	private boolean vivo;
 	private boolean cayendo;
 	private boolean terminarSalto;
+	private boolean inmortal;
+	private long tiempoInmortalInicio;
 	
 
 	public Pep(double x, double y, int ancho, int alto, double f,
@@ -47,9 +49,11 @@ public class Pep {
         this.fireballs = new ArrayList<>();
         this.imagenDerecha = Herramientas.cargarImagen("stepep.png");
         this.imagenIzquierda = Herramientas.cargarImagen("stepe.png");
-        this.impulso = 1.5;
+        this.impulso = 4;
         cayendo = false;
     	terminarSalto = false;
+    	this.inmortal = false;
+    	this.tiempoInmortalInicio = 0;
 	}
 
 	public double getX() {
@@ -67,6 +71,18 @@ public class Pep {
 	public double getAlto() {
 		return this.alto;
 	}
+	public void activarInmortalidad() {
+        this.inmortal = true;
+        this.tiempoInmortalInicio = System.currentTimeMillis();
+    }
+	public void actualizarInmortalidad() {
+        if (this.inmortal && (System.currentTimeMillis() - this.tiempoInmortalInicio) > 3000) {
+            this.inmortal = false; // Se desactiva la inmortalidad después de 3 segundos
+        }
+    }
+	public boolean esInmortal() {
+        return this.inmortal;
+    }
 
 	public void dibujar(Entorno e) {
 		if (vivo)
@@ -182,7 +198,7 @@ public class Pep {
 	}
 	public void lanzarBola() {
         this.anguloFireball = (derecha) ? 0 : 180; // Define el ángulo si es necesario
-        Fireball fireball = new Fireball(this.x, this.y, anguloFireball, derecha);
+        Fireball fireball = new Fireball(this.x, this.y, derecha);
         fireballs.add(fireball); // Añade la nueva bola de fuego a la lista
     }
 	 public void actualizarFireballs() {
@@ -214,15 +230,17 @@ public boolean aterrizaSobreIsla(Isla[] islas) {
 }
 public boolean chocoAlgunEnemigo(Tortugas[] tortuga) {
 	for (Tortugas e : tortuga) {
-		if ((x + ancho / 3 >= e.getX() - e.getAncho() / 2)
+		if ( (e != null) && (x + ancho / 3 >= e.getX() - e.getAncho() / 2)
 				&& (x - ancho / 3 <= e.getX() + e.getAncho() / 2)
 				&& (y + alto / 3 <= e.getY() + e.getAlto() / 2)
-				&& (y + alto / 3 >= e.getY() - e.getAlto() / 2)
-				&& e.estaVivo()) {
+				&& (y + alto / 3 >= e.getY() - e.getAlto() / 2)) {
 			return true;
 		}
 	}
 	return false;
+}
+public boolean mirandoDerecha() {
+	return this.derecha;
 }
 public void morir(Entorno e) {
     if (vivo) {
