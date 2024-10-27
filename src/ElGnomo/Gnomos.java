@@ -26,7 +26,7 @@ public class Gnomos {
 	
 	private static Random rand = new Random();
 
-	public Gnomos(double x, double y, int ancho, int alto, String rutaImagen) {
+	public Gnomos(double x, double y, int ancho, int alto) {
 		this.x = x;
 		this.y = y;
 		this.ancho = ancho;
@@ -34,7 +34,7 @@ public class Gnomos {
 		this.imagen = Herramientas.cargarImagen("gnomo.png");
 		this.puntos = 100;
 		this.random = new Random();
-		this.factorDesplazamiento = 2.0;
+		this.factorDesplazamiento = 1.0;
 	    this.ultimoCambioDireccion = System.currentTimeMillis(); 
 	    this.vivo = true;
 	    this.gravedad = 5;
@@ -139,9 +139,9 @@ public void cambiarDireccion() {
 		vivo = false;
 	}
 
-	public boolean fueChocadoPorUnEnemigo(Gnomos[] enemigos) {
-		for (Gnomos h : enemigos) {
-			if (this.estaVivo() && h.estaVivo()
+	public boolean fueChocadoPorUnEnemigo(Tortugas[] tortuga) {
+		for (Tortugas h : tortuga) {
+			if (this.estaVivo() && h != null
 					&& (x >= h.getX() - h.getAncho() / 2)
 					&& (x <= h.getX() + h.getAncho() / 2)
 					&& (y <= h.getY() + h.getAlto() / 2)
