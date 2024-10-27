@@ -11,12 +11,11 @@ public class Fireball {
     private double velocidad; // velocidad de la bola de fuego
     private boolean moviendoDerecha; // dirección de movimiento
 
-    public Fireball(double x, double y, int angulo, boolean moviendoDerecha) {
+    public Fireball(double x, double y, boolean moviendoDerecha) {
         this.x = x;
         this.y = y;
-        this.angulo = angulo;
         this.moviendoDerecha = moviendoDerecha;
-        this.velocidad = 1.5; // Ajusta la velocidad de la bola de fuego
+        this.velocidad = 5; // Ajusta la velocidad de la bola de fuego
     }
 
     // Método para mover la bola de fuego
