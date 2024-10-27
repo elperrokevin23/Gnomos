@@ -5,19 +5,39 @@ import entorno.Entorno;
 
 public class Score {
 	private int puntos;
+	private int gnomosPerdidos;
+	private int gnomosSalvados;
+	private int enemigosEliminados;
 
 	public Score() {
 		puntos = 0;
+		gnomosPerdidos = 0;
+		gnomosSalvados = 0;
+		enemigosEliminados = 0;
 	}
 
 	public void sumarPuntos(int pun) {
 		puntos += pun;
 	}
-
+	public void sumarGnomosPerdidos (int pun) {
+		gnomosPerdidos += pun;
+	}
+	public void sumarGnomosSalvados (int pun) {
+		gnomosSalvados += pun;
+	}
+	public void cantEnemigosEliminados (int pun) {
+		enemigosEliminados += pun;
+	}
 	public void dibujar(Entorno e) {
-		e.cambiarFont("Arial", 18, Color.WHITE);
-		e.escribirTexto("Puntos: 0" + puntos, e.ancho() * 3 / 4,
-				e.alto() * 9 / 10);
+		e.cambiarFont("Arial", 32, Color.WHITE);
+		e.escribirTexto("Puntos: " + puntos, 560,
+				200);
+		e.cambiarFont("Arial", 28, Color.GREEN);
+		e.escribirTexto("Gnomos salvados: " + gnomosSalvados, 500, 100);
+		e.cambiarFont("Arial", 28, Color.RED);
+		e.escribirTexto("Gnomos perdidos: " + gnomosPerdidos, 500, 50);
+		e.cambiarFont("Arial", 28, Color.GREEN);
+		e.escribirTexto("Enemigos eliminados: " + enemigosEliminados,500,150);
 	}
 
 	public int getScore() {
