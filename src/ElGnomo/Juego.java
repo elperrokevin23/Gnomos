@@ -29,15 +29,16 @@ public class Juego extends InterfaceJuego {
 	private int cantidadDeEnemigos;
 	private int scoreFinal = 0;
 	private long ultimoDisparo = 0; // Tiempo del último disparo en milisegundos
-	private final long INTERVALO_DISPARO = 3000; // 3000 ms = 3 segundos
 	private int puntos = 0;
-	private GrupoDeFireballs fireballs;
+	private Fireball[] fireballs;
 	private Image Casa;
 	private Casa casa;
 	private Image imagenDeVigas;
 	private Tortugas[] tortuga;
 	boolean juegoTerminado = false;
 	Image GameOverImage = null;
+	private int gnomosTocados;
+	private boolean haGanado;
 
 	private long tiempoUltimoGnomoSpawneado;
 
@@ -45,6 +46,9 @@ public class Juego extends InterfaceJuego {
 		int unAncho = 100;
 		int unAlto = 20;
 		int tiempoCongelado = 200; 
+		gnomosTocados = 0;
+		haGanado = false;
+		fondoWin = Herramientas.cargarImagen("GANADOR.jpeg");
 
 		fondo = Herramientas.cargarImagen("fondo.jpg");
 		entorno = new Entorno(
@@ -80,25 +84,25 @@ public class Juego extends InterfaceJuego {
 		islas[12] = new Isla((entorno.ancho() / 2), (ALTO_ESCENARIO / 6) * 5, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
 		islas[13] = new Isla(entorno.ancho() - 220, (ALTO_ESCENARIO / 6) * 5, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
 		islas[14] = new Isla(entorno.ancho() - 35, (ALTO_ESCENARIO / 6) * 5, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
-		pep = new Pep(entorno.ancho() -700, entorno.alto() -555, 20, 30,
-				0.8, true, tiempoCongelado);
+		pep = new Pep(entorno.ancho() -400, entorno.alto() -555, 20, 30,
+				3, true, tiempoCongelado);
 		gnomo = new Gnomos[4];
 		for (int i = 0;i < gnomo.length;i++) {
-			gnomo[i] = new Gnomos(entorno.ancho()/2,(entorno.alto()/6)-40,10,10,"gnomo.png");
+			gnomo[i] = new Gnomos(entorno.ancho()/2,(entorno.alto()/6)-40,10,10);
 		}
 		tortuga = new Tortugas[4];
-		for (int j = 0;j < tortuga.length;j++) {
-			tortuga[j] = new Tortugas(entorno.ancho()/2,(entorno.alto()/2)-100,10,10,"tortuga.png");
-		}
+		tortuga[0] = new Tortugas(entorno.ancho()-690,(entorno.alto()-700),10,10);
+		tortuga[1] = new Tortugas(entorno.ancho()-590,(entorno.alto()-700),10,10);
+		tortuga[2] = new Tortugas(entorno.ancho()-215,(entorno.alto()-700),10,10);
+		tortuga[3] = new Tortugas(entorno.ancho()-105,(entorno.alto()-700),10,10);
 		casa = new Casa((entorno.ancho()/2)-5, (entorno.alto() / 6)-47, 40, 30);
 		cantidadDeTics = 0;
-		fireballs = new GrupoDeFireballs();
+		fireballs = new Fireball[5];
 		puntuacion = new Score();
 		entorno.cambiarFont("Arial", 18, Color.WHITE);
 		entorno.cambiarFont("Arial", 20, Color.WHITE);
-
-
 		entorno.iniciar();
+		Herramientas.loop("Undertale.wav");
 
 	}
 
@@ -111,6 +115,31 @@ public class Juego extends InterfaceJuego {
 		}
 
 		pep.dibujar(entorno);
+		puntuacion.dibujar(entorno);
+		pep.actualizarInmortalidad();
+	    for (int i = 0; i < fireballs.length; i++) {
+	        // Comprueba si la fireball existe
+	        if (fireballs[i] != null) {
+	            fireballs[i].mover();
+	            fireballs[i].dibujar(entorno);
+
+	            // Elimina la fireball si está fuera de los límites
+	            if (fireballs[i].getX() <= 8 || fireballs[i].getX() >= entorno.ancho()-8) {
+	                fireballs[i] = null; // Libera el espacio en el array
+	            }
+	        } 
+	        // Lógica para lanzar una nueva fireball si hay un espacio disponible
+	        else if (entorno.sePresiono('C')) { // Cambia 'C' por la tecla que desees
+	            if (tiempoActual - ultimoDisparo >= 4000) {
+	            double xInicial = pep.getX(); // Centro en X
+	            double yInicial = pep.getY() + 15; // Centro en Y
+	            boolean moviendoDerecha = pep.mirandoDerecha();
+	            fireballs[i] = new Fireball(xInicial, yInicial,moviendoDerecha);
+	            ultimoDisparo = tiempoActual; // Actualiza el tiempo del último disparo
+	            break; // Sal del bucle después de lanzar la fireball
+	        }
+	    }
+	    }
 
 		for (int i = 0; i < gnomo.length; i++) {
 			if (gnomo[i] != null) {  // Verifica si el gnomo existe
@@ -129,35 +158,59 @@ public class Juego extends InterfaceJuego {
 						if (gnomo[i].chocoDerecha(entorno) || gnomo[i].chocoIzquierda(entorno)) {
 							gnomo[i].cambiarDireccion();  // Si choca con los bordes, cambia de dirección
 						}
-
+						if (gnomo[i].fueChocadoPorUnEnemigo(tortuga)) {
+							puntuacion.sumarPuntos(-30);
+							puntuacion.sumarGnomosPerdidos(1);
+							matarGnomo(i);
+						}
 						// Verifica si choca con el héroe (Pep)
-						if (gnomo[i].chocoAlHeroe(pep)) {
+						if (gnomo [i] != null && gnomo[i].chocoAlHeroe(pep)) {
 							puntuacion.sumarPuntos(30);  // Aumenta los puntos al chocar con el héroe
+							puntuacion.sumarGnomosSalvados(1);
+							pep.activarInmortalidad();
 							matarGnomo(i);  // Matar y rescatar ocasionan lo mismo por lo cual utilizamos el mismo metodo
+							puntos++;
+							if (puntos == 1) {
+		                        haGanado = true;  // Marca como ganador
+		                        scoreFinal = puntuacion.getScore();  // Guarda el puntaje final
+		                        Herramientas.loop("BOOEEE.wav");		                    }
 						}
 					}
 				}
 			} else {
 				if (tiempoActual - tiempoUltimoGnomoSpawneado >= INTERVALO_SPAWN_GNOMO) {
-					gnomo[i] = new Gnomos(entorno.ancho()/2,(entorno.alto()/6)-40,10,10,"gnomo.png");
+					gnomo[i] = new Gnomos(entorno.ancho()/2,(entorno.alto()/6)-40,10,10);
 					tiempoUltimoGnomoSpawneado = tiempoActual;
 				}
 			}
 		} 
 		for (int j = 0; j < tortuga.length; j++) {
-			if (tortuga[j] != null) {
-				tortuga[j].dibujar(entorno);
-				if (!tortuga[j].estaSobreAlgunaIsla(islas)) {
-					tortuga[j].caer();
-				} else {
-					if (tortuga[j].estaVivo()) {
-						tortuga[j].mover();
-					}
-					if (tortuga[j].chocoDerecha(entorno) || tortuga[j].chocoIzquierda(entorno)) {
-						tortuga[j].cambiarDireccion();
-					}
-				}
-			}
+		    if (tortuga[j] != null) {
+		    	tortuga[j].dibujar(entorno);
+		        if (!tortuga[j].estaSobreAlgunaIsla(islas)) {
+		            tortuga[j].caer();
+		        } else {
+		        	if(tortuga[j].estaVivo()) {
+		            tortuga[j].moverEnIsla(islas);
+		            tortuga[j].mover();
+		            if (tortuga[j].chocoDerecha(entorno) || tortuga[j].chocoIzquierda(entorno)) {
+		                tortuga[j].cambiarDireccion();
+		            }
+		            if (tortuga[j] != null && tortuga[j].chocoConFireball(fireballs)) {
+		            	tortuga[j] = null;
+		            	puntuacion.cantEnemigosEliminados(1);
+		            	puntuacion.sumarPuntos(20);
+		            }
+		        }
+		        
+		        // Este `else` debe ir si la tortuga no está viva y debe verificar la colisión
+		    }
+		}
+		}
+		if (haGanado) {
+			entorno.dibujarImagen(fondoWin, entorno.ancho() / 2, entorno.alto() / 2, 0, 1.17);
+            return; // Sale del método para no procesar más lógica
+		}
 
 			MovimientoEstado movimiento = MovimientoEstado.Ninguno;
 			pep.actualizarFireballs(); // Mueve las bolas de fuego
@@ -171,15 +224,10 @@ public class Juego extends InterfaceJuego {
 					pep.caer();
 					if (pep.llegoFondo(entorno)) {
 						pep.morir(entorno);
+						Herramientas.loop("Super-Mario-Bros.wav");
 					}
 				} else {
 					pep.dejarDeCaer();
-					if (entorno.sePresiono('C')) {
-						if (tiempoActual - ultimoDisparo >= INTERVALO_DISPARO) {
-							pep.lanzarBola();
-							ultimoDisparo = tiempoActual;
-						}
-					}
 					if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
 						movimiento = MovimientoEstado.Izquierda;
 						pep.moverIzquierda(entorno);
@@ -193,17 +241,12 @@ public class Juego extends InterfaceJuego {
 					if (entorno.estaPresionada(entorno.TECLA_ARRIBA)) {
 						pep.saltar();
 					}
-					if (pep.chocoAlgunEnemigo(tortuga)) {
+					if (pep.chocoAlgunEnemigo(tortuga) && !pep.esInmortal()) {
 						pep.morir(entorno);
+						Herramientas.loop("Super-Mario-Bros.wav");
 					}
 				}            
 				if (pep.estaSaltando()) {
-					if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
-						movimiento = MovimientoEstado.Izquierda;
-					}
-					if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
-						movimiento = MovimientoEstado.Derecha;
-					}
 					pep.moverSalto(movimiento);
 				}} else {
 					if (!juegoTerminado) {
@@ -215,7 +258,7 @@ public class Juego extends InterfaceJuego {
 						entorno.dibujarImagen(GameOverImage, entorno.ancho() / 2 , entorno.alto() / 2,0, 1.17);
 					}
 				}
-		}}
+		}
 
 	private void matarGnomo(int i) {
 		gnomo[i].morir();
