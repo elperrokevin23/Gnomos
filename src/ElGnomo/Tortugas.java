@@ -14,29 +14,31 @@ public class Tortugas {
 	private int puntos;
 	private double factorDesplazamiento;
 	private boolean vivo;
-	private Image imagen;
+	private Image imagenDerecha;
+	private Image imagenIzquierda;
 	private Random random;
 	private long ultimoCambioDireccion; // Tiempo de la última inversión de dirección
 	private int gravedad;
 	private boolean cayendo;
 	private int direccion;
-	private boolean moviendoseALaDerecha;
+	private boolean moviendoseALaIzquierda;
 
-	public Tortugas(double x, double y, int ancho, int alto, String rutaImagen) {
+	public Tortugas(double x, double y, int ancho, int alto) {
 		this.x = x;
 		this.y = y;
 		this.ancho = ancho;
 		this.alto = alto;
-		this.imagen = Herramientas.cargarImagen("tortuga.png");
+		this.imagenDerecha = Herramientas.cargarImagen("tortuga.png");
+		this.imagenIzquierda = Herramientas.cargarImagen("tortuga3.png");
 		this.puntos = 100;
 		this.random = new Random();
-		this.factorDesplazamiento = 2.0;
+		this.factorDesplazamiento = 2.3;
 	    this.ultimoCambioDireccion = System.currentTimeMillis(); 
 	    this.vivo = true;
 	    this.gravedad = 5;
 	    cayendo = false;
 	    this.direccion = 1;
-	    this.moviendoseALaDerecha = true; // Inicialmente moviéndose a la derecha
+	    this.moviendoseALaIzquierda = true; // Inicialmente moviéndose a la derecha
 	}
 
 	
@@ -58,7 +60,7 @@ public class Tortugas {
 	
 
 public void mover() {
-	if (moviendoseALaDerecha) {
+	if (moviendoseALaIzquierda) {
 		x -= factorDesplazamiento;
 	}
 	else {
@@ -66,7 +68,7 @@ public void mover() {
 	}
 }
 public void cambiarDireccion() {
-    moviendoseALaDerecha = !moviendoseALaDerecha; // Invierte la dirección
+	moviendoseALaIzquierda = !moviendoseALaIzquierda; // Invierte la dirección
 }
 
 
@@ -115,6 +117,7 @@ public void cambiarDireccion() {
 			}
 		}
 	}
+	
 
 	public boolean chocoAlHeroe(Pep h) {
 		if ((x >= h.getX() - h.getAncho() / 2)
@@ -134,29 +137,56 @@ public void cambiarDireccion() {
 		vivo = false;
 	}
 
-	public boolean fueChocadoPorUnEnemigo(Gnomos[] enemigos) {
-		for (Gnomos h : enemigos) {
-			if (this.estaVivo() && h.estaVivo()
-					&& (x >= h.getX() - h.getAncho() / 2)
-					&& (x <= h.getX() + h.getAncho() / 2)
-					&& (y <= h.getY() + h.getAlto() / 2)
-					&& (y >= h.getY() - h.getAlto() / 2)) {
-				return true;
-			}
-		}
-		return false;
+	public boolean chocoConFireball(Fireball[] fireballs) {
+	    for (Fireball fireball : fireballs) {
+	        if (fireball != null && this.estaVivo()) {
+	            // Coordenadas de los bordes de la bola de fuego
+	            double fireballXIzquierda = fireball.getX() - 10;  // 10 es la mitad del ancho de la fireball
+	            double fireballXDerecha = fireball.getX() + 10;
+	            double fireballYSuperior = fireball.getY() - 10;   // 10 es la mitad de la altura de la fireball
+	            double fireballYInferior = fireball.getY() + 10;
+
+	            // Coordenadas de los bordes de la tortuga
+	            double tortugaXIzquierda = this.getX() - this.getAncho() / 2;
+	            double tortugaXDerecha = this.getX() + this.getAncho() / 2;
+	            double tortugaYSuperior = this.getY() - this.getAlto() / 2;
+	            double tortugaYInferior = this.getY() + this.getAlto() / 2;
+
+	            // Verifica si hay colisión
+	            if (fireballXIzquierda <= tortugaXDerecha && fireballXDerecha >= tortugaXIzquierda &&
+	                fireballYInferior >= tortugaYSuperior && fireballYSuperior <= tortugaYInferior) {
+	                return true;  // Colisión detectada
+	            }
+	        }
+	    }
+	    return false;  // No hubo colisión
 	}
-	public boolean chocoFireball(Fireball[] fireballs) {
-		for (int x = 0; x < fireballs.length; x++) {
-			if (fireballs[x] != null
-					&& fireballs[x].getX() <= this.x + this.ancho / 2
-					&& fireballs[x].getX() >= this.x - this.ancho / 2
-					&& (fireballs[x].getY() >= y - alto / 2 && fireballs[x].getY() <= y
-							+ alto / 2)) {
-				return true;
-			}
-		}
-		return false;
+
+	public boolean chocoConGnomo(Gnomos[] gnomos) {
+	    for (Gnomos gnomo : gnomos) {
+	        if (gnomo != null && gnomo.estaVivo()) {
+	            // Coordenadas de la tortuga
+	            double tortugaXMin = this.x - this.ancho / 2;
+	            double tortugaXMax = this.x + this.ancho / 2;
+	            double tortugaYMin = this.y - this.alto / 2;
+	            double tortugaYMax = this.y + this.alto / 2;
+
+	            // Coordenadas del gnomo
+	            double gnomoXMin = gnomo.getX() - gnomo.getAncho() / 2;
+	            double gnomoXMax = gnomo.getX() + gnomo.getAncho() / 2;
+	            double gnomoYMin = gnomo.getY() - gnomo.getAlto() / 2;
+	            double gnomoYMax = gnomo.getY() + gnomo.getAlto() / 2;
+
+	            // Comprobar si las dos cajas (tortuga y gnomo) se superponen
+	            boolean colisionX = (tortugaXMin <= gnomoXMax && tortugaXMax >= gnomoXMin);
+	            boolean colisionY = (tortugaYMin <= gnomoYMax && tortugaYMax >= gnomoYMin);
+
+	            if (colisionX && colisionY) {
+	                return true;
+	            }
+	        }
+	    }
+	    return false;
 	}
 	public void caer() {
 		// y += factorDesplazamiento+impulso*3/2;
@@ -168,6 +198,28 @@ public void cambiarDireccion() {
 	public boolean chocoIzquierda(Entorno e) {
 		return x - ancho / 2 <= 0;
 	}
+	public void moverEnIsla(Isla[] islas) {
+	    for (int z = 0; z < islas.length; z++) {
+	        // Verifica si la tortuga está sobre esta isla
+	    	if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2)
+					&& (x - ancho / 2 <= islas[z].getX() + islas[z].getAncho()
+							/ 2)
+					&& (y + alto / 2 >= islas[z].getY() - islas[z].getAlto()
+							/ 2)
+					&& (y - alto / 2 <= islas[z].getY() + islas[z].getAlto()
+							/ 2)) {
+
+	            // Si llega al borde derecho de la isla, cambia de dirección a la izquierda
+	            if (x - ancho / 2 <= islas[z].getX() - islas[z].getAncho() / 2) {
+	            	moviendoseALaIzquierda = false;
+	            }
+	            // Si llega al borde izquierda de la isla, cambia de dirección a la derecha
+	            else if (x + ancho / 2 >= islas[z].getX() + islas[z].getAncho() / 2) {
+	            	moviendoseALaIzquierda = true;
+	            }
+	        }
+	    }
+	}
 
 	public boolean chocoDerecha(Entorno e) {
 		return x + ancho / 2 >= e.ancho();
@@ -175,7 +227,7 @@ public void cambiarDireccion() {
 
 	public void dibujar(Entorno entorno) {
 		if (estaVivo()) {
-        entorno.dibujarImagen(this.imagen, this.x, this.y, 0);  // Dibujar imagen en la posición (x, y)
+        entorno.dibujarImagen(moviendoseALaIzquierda ? imagenIzquierda : imagenDerecha,this.x,this.y,0);  // Dibujar imagen en la posición (x, y)
     }
 	}
 }
