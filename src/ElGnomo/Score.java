@@ -8,12 +8,14 @@ public class Score {
 	private int gnomosPerdidos;
 	private int gnomosSalvados;
 	private int enemigosEliminados;
+	private long tiempoInicio;
 
 	public Score() {
 		puntos = 0;
 		gnomosPerdidos = 0;
 		gnomosSalvados = 0;
 		enemigosEliminados = 0;
+		tiempoInicio = System.currentTimeMillis();
 	}
 
 	public void sumarPuntos(int pun) {
@@ -38,6 +40,12 @@ public class Score {
 		e.escribirTexto("Gnomos perdidos: " + gnomosPerdidos, 500, 50);
 		e.cambiarFont("Arial", 28, Color.GREEN);
 		e.escribirTexto("Enemigos eliminados: " + enemigosEliminados,500,150);
+		long tiempoActual = System.currentTimeMillis();
+		int tiempoTranscurridoSegundos = (int) ((tiempoActual - tiempoInicio) / 1000);
+
+		// Dibujar el tiempo en pantalla
+		e.cambiarFont("Arial", 28, Color.BLACK);
+		e.escribirTexto("Tiempo: " + tiempoTranscurridoSegundos + " s", 10, 30);
 	}
 
 	public int getScore() {
