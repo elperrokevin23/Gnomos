@@ -22,6 +22,7 @@ public class Tortugas {
 	private boolean cayendo;
 	private int direccion;
 	private boolean moviendoseALaIzquierda;
+	private long ultimoDisparo;
 
 	public Tortugas(double x, double y, int ancho, int alto) {
 		this.x = x;
@@ -128,6 +129,12 @@ public void cambiarDireccion() {
 		}
 		return false;
 	}
+	public long getUltimoDisparo() {
+	    return this.ultimoDisparo;
+	}
+	public void setUltimoDisparo(long tiempo) {
+	    this.ultimoDisparo = tiempo;
+	}
 
 	public int getPuntos() {
 		return puntos;
@@ -223,6 +230,12 @@ public void cambiarDireccion() {
 
 	public boolean chocoDerecha(Entorno e) {
 		return x + ancho / 2 >= e.ancho();
+	}
+	public boolean puedeDisparar(long tiempoActual, long intervaloDisparo) {
+	    return tiempoActual - this.ultimoDisparo >= intervaloDisparo;
+	}
+	public boolean izquierda() {
+		return this.moviendoseALaIzquierda;
 	}
 
 	public void dibujar(Entorno entorno) {
