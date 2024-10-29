@@ -32,6 +32,7 @@ public class Pep {
 	private boolean terminarSalto;
 	private boolean inmortal;
 	private long tiempoInmortalInicio;
+	private boolean escudo;
 	
 
 	public Pep(double x, double y, int ancho, int alto, double f,
@@ -54,6 +55,8 @@ public class Pep {
     	terminarSalto = false;
     	this.inmortal = false;
     	this.tiempoInmortalInicio = 0;
+    	this.escudo = false;
+    	
 	}
 
 	public double getX() {
@@ -76,14 +79,22 @@ public class Pep {
         this.tiempoInmortalInicio = System.currentTimeMillis();
     }
 	public void actualizarInmortalidad() {
-        if (this.inmortal && (System.currentTimeMillis() - this.tiempoInmortalInicio) > 3000) {
-            this.inmortal = false; // Se desactiva la inmortalidad después de 3 segundos
+        if (this.inmortal && (System.currentTimeMillis() - this.tiempoInmortalInicio) > 4000) {
+            this.inmortal = false; // Se desactiva la inmortalidad después de 4 segundos
         }
     }
 	public boolean esInmortal() {
         return this.inmortal;
     }
-
+	public void activarEscudo() {
+		this.escudo = true;
+	}
+	public boolean usaEscudo() {
+		return this.escudo;
+	}
+	public void desactivarEscudo() {
+	    this.escudo = false;
+	}
 	public void dibujar(Entorno e) {
 		if (vivo)
 			e.dibujarImagen(derecha ? imagenDerecha : imagenIzquierda, x, y, 0,
@@ -228,6 +239,7 @@ public boolean aterrizaSobreIsla(Isla[] islas) {
     }
     return false;
 }
+
 public boolean chocoAlgunEnemigo(Tortugas[] tortuga) {
 	for (Tortugas e : tortuga) {
 		if ( (e != null) && (x + ancho / 3 >= e.getX() - e.getAncho() / 2)
@@ -238,6 +250,30 @@ public boolean chocoAlgunEnemigo(Tortugas[] tortuga) {
 		}
 	}
 	return false;
+}
+public boolean chocoConBomba(Bombas[] bomba) {
+    for (Bombas bomb : bomba) {
+        if (bomb != null && this.estaVivo()) {
+            // Coordenadas de los bordes de la bola de fuego
+            double bombaXIzquierda = bomb.getX() - 10;  // 10 es la mitad del ancho de la fireball
+            double bombaXDerecha = bomb.getX() + 10;
+            double bombaYSuperior = bomb.getY() - 10;   // 10 es la mitad de la altura de la fireball
+            double bombaYInferior = bomb.getY() + 10;
+
+            // Coordenadas de los bordes de la tortuga
+            double pepXIzquierda = this.getX() - this.getAncho() / 2;
+            double pepXDerecha = this.getX() + this.getAncho() / 2;
+            double pepYSuperior = this.getY() - this.getAlto() / 2;
+            double pepYInferior = this.getY() + this.getAlto() / 2;
+
+            // Verifica si hay colisión
+            if (bombaXIzquierda <= pepXDerecha && bombaXDerecha >= pepXIzquierda &&
+                bombaYInferior >= pepYSuperior && bombaYSuperior <= pepYInferior) {
+                return true;  // Colisión detectada
+            }
+        }
+    }
+    return false;  // No hubo colisión
 }
 public boolean mirandoDerecha() {
 	return this.derecha;
