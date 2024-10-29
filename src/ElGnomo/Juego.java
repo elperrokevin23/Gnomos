@@ -7,6 +7,7 @@ import entorno.InterfaceJuego;
 import entorno.Herramientas;
 import java.awt.Image;
 import java.io.File;
+import java.util.Random;
 
 import ElGnomo.Isla.IslaTipo;
 
@@ -39,8 +40,12 @@ public class Juego extends InterfaceJuego {
 	Image GameOverImage = null;
 	private int gnomosTocados;
 	private boolean haGanado;
-
+	private Bombas[] bomba;
+	private long tiempoUltimaBomba = 0; // Tiempo del último disparo de bomba
+    private static final int INTERVALO_DISPARO_BOMBA = 2000; // Intervalo de 5 segundos
+	private long ultimoDisparoBomba = 0;
 	private long tiempoUltimoGnomoSpawneado;
+	private static long tiempoInicio;
 
 	public Juego() {
 		int unAncho = 100;
@@ -49,6 +54,8 @@ public class Juego extends InterfaceJuego {
 		gnomosTocados = 0;
 		haGanado = false;
 		fondoWin = Herramientas.cargarImagen("GANADOR.jpeg");
+		this.tiempoInicio = System.currentTimeMillis();
+		
 
 		fondo = Herramientas.cargarImagen("fondo.jpg");
 		entorno = new Entorno(
@@ -59,31 +66,13 @@ public class Juego extends InterfaceJuego {
 		Casa = Herramientas.cargarImagen("casa.png");
 
 		islas = new Isla[15]; // Array para las 15 islas
-
-		// Fila 1: Una viga centrada
-		islas[0] = new Isla(entorno.ancho() / 2, ALTO_ESCENARIO / 6, unAncho, unAlto, imagenDeVigas,  IslaTipo.CasaGnomos);
-
-		// Fila 2: Dos vigas (izquierda y derecha)
-		islas[1] = new Isla(entorno.ancho() - 495, (ALTO_ESCENARIO / 6) * 2, unAncho, unAlto, imagenDeVigas, IslaTipo.Superior);
-		islas[2] = new Isla((entorno.ancho() - 552) * 2, (ALTO_ESCENARIO / 6) * 2, unAncho, unAlto, imagenDeVigas, IslaTipo.Superior);
-
-		// Fila 3: Tres vigas (distribuidas uniformemente)
-		islas[3] = new Isla(entorno.ancho() - 590, (ALTO_ESCENARIO / 6) * 3, unAncho, unAlto, imagenDeVigas, IslaTipo.Superior);
-		islas[4] = new Isla(entorno.ancho() / 2, (ALTO_ESCENARIO / 6) * 3, unAncho, unAlto, imagenDeVigas, IslaTipo.Superior);
-		islas[5] = new Isla(entorno.ancho() - 215, (ALTO_ESCENARIO / 6) * 3, unAncho, unAlto, imagenDeVigas, IslaTipo.Superior);
-
-		// Fila 4: Cuatro vigas (distribuidas uniformemente)
-		islas[6] = new Isla(entorno.ancho() - 680, (ALTO_ESCENARIO / 6) * 4, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
-		islas[7] = new Isla(entorno.ancho() - 495, (ALTO_ESCENARIO / 6) * 4, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
-		islas[8] = new Isla(entorno.ancho() - 310, (ALTO_ESCENARIO / 6) * 4, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
-		islas[9] = new Isla(entorno.ancho() - 130, (ALTO_ESCENARIO / 6) * 4, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
-
-		// Fila 5: Cinco vigas (distribuidas uniformemente)
-		islas[10] = new Isla(entorno.ancho() - 770, (ALTO_ESCENARIO / 6) * 5, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
-		islas[11] = new Isla(entorno.ancho() - 580, (ALTO_ESCENARIO / 6) * 5, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
-		islas[12] = new Isla((entorno.ancho() / 2), (ALTO_ESCENARIO / 6) * 5, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
-		islas[13] = new Isla(entorno.ancho() - 220, (ALTO_ESCENARIO / 6) * 5, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
-		islas[14] = new Isla(entorno.ancho() - 35, (ALTO_ESCENARIO / 6) * 5, unAncho, unAlto, imagenDeVigas, IslaTipo.Inferior);
+		int[] xxPos = {entorno.ancho() / 2,entorno.ancho() - 310,entorno.ancho() - 495,entorno.ancho() - 580,entorno.ancho() / 2,entorno.ancho() - 220,entorno.ancho() - 680,entorno.ancho() - 495,entorno.ancho() - 310,entorno.ancho() - 130,entorno.ancho() - 770,entorno.ancho() - 580,entorno.ancho() / 2,entorno.ancho() - 220,entorno.ancho() - 35};
+		int[] yyPos = {ALTO_ESCENARIO / 6,(ALTO_ESCENARIO / 6) * 2,(ALTO_ESCENARIO / 6) * 2,(ALTO_ESCENARIO / 6) * 3,(ALTO_ESCENARIO / 6) * 3,(ALTO_ESCENARIO / 6) * 3,(ALTO_ESCENARIO / 6) * 4,(ALTO_ESCENARIO / 6) * 4,(ALTO_ESCENARIO / 6) * 4,(ALTO_ESCENARIO / 6) * 4,(ALTO_ESCENARIO / 6) * 5,(ALTO_ESCENARIO / 6) * 5,(ALTO_ESCENARIO / 6) * 5,(ALTO_ESCENARIO / 6) * 5,(ALTO_ESCENARIO / 6) * 5};
+		IslaTipo[] tipo = {IslaTipo.CasaGnomos,IslaTipo.Superior,IslaTipo.Superior,IslaTipo.Superior,IslaTipo.Superior,IslaTipo.Superior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior};
+		for (int p = 0; p < islas.length; p++) {
+			islas[p] = new Isla(xxPos[p], yyPos[p],unAncho,unAlto,imagenDeVigas,tipo[p]);
+		}
+		
 		pep = new Pep(entorno.ancho() -400, entorno.alto() -555, 20, 30,
 				3, true, tiempoCongelado);
 		gnomo = new Gnomos[4];
@@ -91,13 +80,16 @@ public class Juego extends InterfaceJuego {
 			gnomo[i] = new Gnomos(entorno.ancho()/2,(entorno.alto()/6)-40,10,10);
 		}
 		tortuga = new Tortugas[4];
-		tortuga[0] = new Tortugas(entorno.ancho()-690,(entorno.alto()-700),10,10);
-		tortuga[1] = new Tortugas(entorno.ancho()-590,(entorno.alto()-700),10,10);
-		tortuga[2] = new Tortugas(entorno.ancho()-215,(entorno.alto()-700),10,10);
-		tortuga[3] = new Tortugas(entorno.ancho()-105,(entorno.alto()-700),10,10);
+		int[] xPos = {entorno.ancho() - 690, entorno.ancho() - 590, entorno.ancho() - 215, entorno.ancho() - 105};
+		int yPos = entorno.alto() - 700;
+
+		for (int i = 0; i < tortuga.length; i++) {
+		    tortuga[i] = new Tortugas(xPos[i], yPos,10,10);
+		}
 		casa = new Casa((entorno.ancho()/2)-5, (entorno.alto() / 6)-47, 40, 30);
 		cantidadDeTics = 0;
 		fireballs = new Fireball[5];
+		bomba = new Bombas[5];
 		puntuacion = new Score();
 		entorno.cambiarFont("Arial", 18, Color.WHITE);
 		entorno.cambiarFont("Arial", 20, Color.WHITE);
@@ -107,16 +99,44 @@ public class Juego extends InterfaceJuego {
 	}
 
 	public void tick() {
-
 		long tiempoActual = System.currentTimeMillis();
 		entorno.dibujarImagen(fondo, entorno.ancho() / 2, entorno.alto() / 2 , 0, 1.17);
 		for (Isla v : islas) {
 			v.dibujar(entorno);
 		}
-
 		pep.dibujar(entorno);
 		puntuacion.dibujar(entorno);
 		pep.actualizarInmortalidad();
+		Random random = new Random();
+		for (int i = 0; i < bomba.length; i++) {
+		    // Comprueba si la bomba existe
+		    if (bomba[i] != null) {
+		        bomba[i].mover();
+		        bomba[i].dibujar(entorno);
+
+		        // Elimina la bomba si sale de los límites
+		        if (bomba[i].getX() <= -140 || bomba[i].getX() >= entorno.ancho() + 140) {
+		            bomba[i] = null; // Libera el espacio en el array
+		        }
+		    } 
+		    // Si el espacio está libre, genera una nueva bomba desde una tortuga aleatoria
+		    if (bomba[i] == null) {
+		        // Selecciona una tortuga aleatoria
+		        int indiceTortuga = random.nextInt(tortuga.length);
+		        Tortugas tortugaSeleccionada = tortuga[indiceTortuga];
+
+		        // Si la tortuga seleccionada es válida, crea una nueva bomba
+		        if (tortugaSeleccionada != null) {
+		            double xInicial = tortugaSeleccionada.getX();
+		            double yInicial = tortugaSeleccionada.getY() + 5;
+		            boolean moviendoDerecha = !tortugaSeleccionada.izquierda();
+
+		            // Genera la bomba en la posición de la tortuga seleccionada
+		            bomba[i] = new Bombas(xInicial, yInicial, moviendoDerecha);
+		        }
+		    }
+		}
+
 	    for (int i = 0; i < fireballs.length; i++) {
 	        // Comprueba si la fireball existe
 	        if (fireballs[i] != null) {
@@ -127,12 +147,23 @@ public class Juego extends InterfaceJuego {
 	            if (fireballs[i].getX() <= 8 || fireballs[i].getX() >= entorno.ancho()-8) {
 	                fireballs[i] = null; // Libera el espacio en el array
 	            }
+	            else {
+	                // Verifica colisiones con cada bomba individualmente
+	                for (int j = 0; j < bomba.length; j++) {
+	                    if (bomba[j] != null && fireballs[i].chocoConBomba(bomba[j])) {
+	                        // Solo elimina la fireball y la bomba específicas que colisionaron
+	                        fireballs[i] = null;
+	                        bomba[j] = null;
+	                        break; // Sal del bucle de bombas para evitar más colisiones con esta fireball
+	                    }
+	                }
+	            }
 	        } 
 	        // Lógica para lanzar una nueva fireball si hay un espacio disponible
 	        else if (entorno.sePresiono('C')) { // Cambia 'C' por la tecla que desees
-	            if (tiempoActual - ultimoDisparo >= 4000) {
+	            if (tiempoActual - ultimoDisparo >= 5000) {
 	            double xInicial = pep.getX(); // Centro en X
-	            double yInicial = pep.getY() + 15; // Centro en Y
+	            double yInicial = pep.getY() + 10; // Centro en Y
 	            boolean moviendoDerecha = pep.mirandoDerecha();
 	            fireballs[i] = new Fireball(xInicial, yInicial,moviendoDerecha);
 	            ultimoDisparo = tiempoActual; // Actualiza el tiempo del último disparo
@@ -149,28 +180,36 @@ public class Juego extends InterfaceJuego {
 					gnomo[i].caer();  // Si no está sobre una isla, cae
 					if (gnomo[i].llegoFondo(entorno)) {
 						matarGnomo(i);
+						puntuacion.sumarGnomosPerdidos(1);
+						puntuacion.sumarPuntos(-10);
 					}
 				} else {
-					if (gnomo[i].estaVivo()) {  // Si está vivo, puede moverse y chequear colisiones
+					if (gnomo[i] != null && gnomo[i].estaVivo()) {  // Si está vivo, puede moverse y chequear colisiones
 						gnomo[i].cayoSobreUnaIsla(islas);
 						gnomo[i].mover();
 
 						if (gnomo[i].chocoDerecha(entorno) || gnomo[i].chocoIzquierda(entorno)) {
 							gnomo[i].cambiarDireccion();  // Si choca con los bordes, cambia de dirección
 						}
-						if (gnomo[i].fueChocadoPorUnEnemigo(tortuga)) {
-							puntuacion.sumarPuntos(-30);
+						if (gnomo[i] != null && gnomo[i].fueChocadoPorUnEnemigo(tortuga)) {
+							puntuacion.sumarPuntos(-10);
 							puntuacion.sumarGnomosPerdidos(1);
 							matarGnomo(i);
 						}
+						if (gnomo[i] != null && gnomo[i].chocoConBomba(bomba)) {
+							puntuacion.sumarPuntos(-10);
+							puntuacion.sumarGnomosPerdidos(1);
+							matarGnomo(i);
+						}
+
 						// Verifica si choca con el héroe (Pep)
 						if (gnomo [i] != null && gnomo[i].chocoAlHeroe(pep)) {
 							puntuacion.sumarPuntos(30);  // Aumenta los puntos al chocar con el héroe
 							puntuacion.sumarGnomosSalvados(1);
-							pep.activarInmortalidad();
+							pep.activarInmortalidad();  // Activa inmortalidad
 							matarGnomo(i);  // Matar y rescatar ocasionan lo mismo por lo cual utilizamos el mismo metodo
 							puntos++;
-							if (puntos == 1) {
+							if (puntos == 10) {
 		                        haGanado = true;  // Marca como ganador
 		                        scoreFinal = puntuacion.getScore();  // Guarda el puntaje final
 		                        Herramientas.loop("BOOEEE.wav");		                    }
@@ -198,6 +237,9 @@ public class Juego extends InterfaceJuego {
 		            }
 		            if (tortuga[j] != null && tortuga[j].chocoConFireball(fireballs)) {
 		            	tortuga[j] = null;
+		            	for (int k = 0;k < fireballs.length;k++) {
+		            		fireballs[k] = null;
+		            	}
 		            	puntuacion.cantEnemigosEliminados(1);
 		            	puntuacion.sumarPuntos(20);
 		            }
@@ -241,11 +283,15 @@ public class Juego extends InterfaceJuego {
 					if (entorno.estaPresionada(entorno.TECLA_ARRIBA)) {
 						pep.saltar();
 					}
+					if (pep.chocoConBomba(bomba) && !pep.esInmortal()) {
+						pep.morir(entorno);
+						Herramientas.loop("Super-Mario-Bros.wav");
+					}
 					if (pep.chocoAlgunEnemigo(tortuga) && !pep.esInmortal()) {
 						pep.morir(entorno);
 						Herramientas.loop("Super-Mario-Bros.wav");
 					}
-				}            
+				}
 				if (pep.estaSaltando()) {
 					pep.moverSalto(movimiento);
 				}} else {
