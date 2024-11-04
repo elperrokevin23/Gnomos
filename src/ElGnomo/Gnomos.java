@@ -166,14 +166,13 @@ public void cambiarDireccion() {
 	public boolean ultimaIslaEsInferior() {
 		return estaEnIslaInferior;
 	}
-	public boolean chocoConBomba(Bombas[] bomba) {
-	    for (Bombas bomb : bomba) {
-	        if (bomb != null && this.estaVivo()) {
+	public boolean chocoConBomba(Bombas bomba) {
+	        if (bomba != null && this.estaVivo()) {
 	            // Coordenadas de los bordes de la bola de fuego
-	            double bombaXIzquierda = bomb.getX() - 10;  // 10 es la mitad del ancho de la fireball
-	            double bombaXDerecha = bomb.getX() + 10;
-	            double bombaYSuperior = bomb.getY() - 10;   // 10 es la mitad de la altura de la fireball
-	            double bombaYInferior = bomb.getY() + 10;
+	            double bombaXIzquierda = bomba.getX() - 10;  // 10 es la mitad del ancho de la fireball
+	            double bombaXDerecha = bomba.getX() + 10;
+	            double bombaYSuperior = bomba.getY() - 10;   // 10 es la mitad de la altura de la fireball
+	            double bombaYInferior = bomba.getY() + 10;
 
 	            // Coordenadas de los bordes de la tortuga
 	            double pepXIzquierda = this.getX() - this.getAncho() / 2;
@@ -187,7 +186,6 @@ public void cambiarDireccion() {
 	                return true;  // Colisión detectada
 	            }
 	        }
-	    }
 	    return false;  // No hubo colisión
 	}
 	
