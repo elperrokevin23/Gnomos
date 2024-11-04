@@ -13,21 +13,17 @@ import ElGnomo.Isla.IslaTipo;
 
 public class Juego extends InterfaceJuego {
 
-	private static final int TIEMPO_DE_COSO_POWER_UP = 350;
 	private static final int ALTO_ESCENARIO = 600;
 	private static final int ANCHO_ESCENARIO = 800;
 	private static final int ALTO_DEL_SECTOR_DE_PUNTUACION = 100;
 	private static final int INTERVALO_SPAWN_GNOMO = 1500;
-	private static final int INTERVALO_SPAWN_TORTUGA = 2000;
 	private Entorno entorno;
 	private Isla[] islas;
 	private Pep pep;
 	private Gnomos[] gnomo;
 	private Image fondo;
 	private Image fondoWin;
-	private int cantidadDeTics;
 	private Score puntuacion;
-	private int cantidadDeEnemigos;
 	private int scoreFinal = 0;
 	private long ultimoDisparo = 0; // Tiempo del último disparo en milisegundos
 	private int puntos = 0;
@@ -38,23 +34,18 @@ public class Juego extends InterfaceJuego {
 	private Tortugas[] tortuga;
 	boolean juegoTerminado = false;
 	Image GameOverImage = null;
-	private int gnomosTocados;
 	private boolean haGanado;
 	private Bombas[] bomba;
-	private long tiempoUltimaBomba = 0; // Tiempo del último disparo de bomba
-    private static final int INTERVALO_DISPARO_BOMBA = 2000; // Intervalo de 5 segundos
-	private long ultimoDisparoBomba = 0;
 	private long tiempoUltimoGnomoSpawneado;
-	private static long tiempoInicio;
+	public int cantTortuga;
 
 	public Juego() {
 		int unAncho = 100;
 		int unAlto = 20;
 		int tiempoCongelado = 200; 
-		gnomosTocados = 0;
 		haGanado = false;
 		fondoWin = Herramientas.cargarImagen("GANADOR.jpeg");
-		this.tiempoInicio = System.currentTimeMillis();
+		cantTortuga = 0;
 		
 
 		fondo = Herramientas.cargarImagen("fondo.jpg");
@@ -87,7 +78,6 @@ public class Juego extends InterfaceJuego {
 		    tortuga[i] = new Tortugas(xPos[i], yPos,10,10);
 		}
 		casa = new Casa((entorno.ancho()/2)-5, (entorno.alto() / 6)-47, 40, 30);
-		cantidadDeTics = 0;
 		fireballs = new Fireball[5];
 		bomba = new Bombas[5];
 		puntuacion = new Score();
@@ -209,10 +199,11 @@ public class Juego extends InterfaceJuego {
 							pep.activarInmortalidad();  // Activa inmortalidad
 							matarGnomo(i);  // Matar y rescatar ocasionan lo mismo por lo cual utilizamos el mismo metodo
 							puntos++;
-							if (puntos == 10) {
+							if (puntos == 1) {
 		                        haGanado = true;  // Marca como ganador
 		                        scoreFinal = puntuacion.getScore();  // Guarda el puntaje final
-		                        Herramientas.loop("BOOEEE.wav");		                    }
+		                        Herramientas.loop("BOOEEE.wav");		                    
+		                        }
 						}
 					}
 				}
@@ -237,6 +228,11 @@ public class Juego extends InterfaceJuego {
 		            }
 		            if (tortuga[j] != null && tortuga[j].chocoConFireball(fireballs)) {
 		            	tortuga[j] = null;
+		            	cantTortuga = cantTortuga + 1;
+		            	if (cantTortuga == 4) {
+			            	haGanado = true;
+		            	}
+		            	
 		            	for (int k = 0;k < fireballs.length;k++) {
 		            		fireballs[k] = null;
 		            	}
@@ -283,11 +279,12 @@ public class Juego extends InterfaceJuego {
 					if (entorno.estaPresionada(entorno.TECLA_ARRIBA)) {
 						pep.saltar();
 					}
-					if (pep.chocoConBomba(bomba) && !pep.esInmortal()) {
+
+					if (pep.chocoAlgunEnemigo(tortuga) && !pep.esInmortal()) {
 						pep.morir(entorno);
 						Herramientas.loop("Super-Mario-Bros.wav");
 					}
-					if (pep.chocoAlgunEnemigo(tortuga) && !pep.esInmortal()) {
+					if (pep.chocoConBomba(bomba) && !pep.esInmortal()) {
 						pep.morir(entorno);
 						Herramientas.loop("Super-Mario-Bros.wav");
 					}
