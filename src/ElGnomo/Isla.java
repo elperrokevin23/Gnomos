@@ -3,7 +3,6 @@ package ElGnomo;
 import java.awt.Color;
 
 import entorno.Entorno;
-import entorno.Herramientas;
 import java.awt.Image;
 
 public class Isla {
