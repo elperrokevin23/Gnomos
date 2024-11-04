@@ -10,17 +10,13 @@ public class Tortugas {
 	private double y;
 	private int ancho;
 	private int alto;
-	private Image imagenVivo;
 	private int puntos;
 	private double factorDesplazamiento;
 	private boolean vivo;
 	private Image imagenDerecha;
 	private Image imagenIzquierda;
-	private Random random;
-	private long ultimoCambioDireccion; // Tiempo de la última inversión de dirección
 	private int gravedad;
 	private boolean cayendo;
-	private int direccion;
 	private boolean moviendoseALaIzquierda;
 	private long ultimoDisparo;
 
@@ -32,13 +28,10 @@ public class Tortugas {
 		this.imagenDerecha = Herramientas.cargarImagen("tortuga.png");
 		this.imagenIzquierda = Herramientas.cargarImagen("tortuga3.png");
 		this.puntos = 100;
-		this.random = new Random();
 		this.factorDesplazamiento = 2.3;
-	    this.ultimoCambioDireccion = System.currentTimeMillis(); 
 	    this.vivo = true;
 	    this.gravedad = 5;
 	    cayendo = false;
-	    this.direccion = 1;
 	    this.moviendoseALaIzquierda = true; // Inicialmente moviéndose a la derecha
 	}
 
