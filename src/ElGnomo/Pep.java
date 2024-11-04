@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import ElGnomo.Juego.MovimientoEstado;
 import entorno.Entorno;
 import entorno.Herramientas;
-import entorno.Herramientas;
 
 public class Pep {
 	private double x;
@@ -16,16 +15,14 @@ public class Pep {
 	private int alto;
 	static boolean saltando = false;
     private int anguloFireball;
-    private String direccion;
     private ArrayList<Fireball> fireballs;
 	private double factorDesplazamiento;
 	private double impulso;
 	private double limiteDeSaltoY;
 	private boolean derecha;
-	private double gravedad = 3;
+	private double gravedad = 8;
 	private Image imagenDerecha;
 	private Image imagenIzquierda;
-	private Image imagenMuerto;
 	private int vidas;
 	private boolean vivo;
 	private boolean cayendo;
@@ -45,7 +42,6 @@ public class Pep {
 		this.derecha = der;
 		this.vidas = 5;
 		vivo = true;
-        this.direccion = "derecha";
         this.anguloFireball = 0;
         this.fireballs = new ArrayList<>();
         this.imagenDerecha = Herramientas.cargarImagen("stepep.png");
