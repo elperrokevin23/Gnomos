@@ -203,10 +203,10 @@ public class Juego extends InterfaceJuego {
 							pep.activarInmortalidad();  // Activa inmortalidad
 							matarGnomo(i);  // Matar y rescatar ocasionan lo mismo por lo cual utilizamos el mismo metodo
 							puntos++;
-							if (puntos == 10) {
+							if (puntos == 1) {
 		                        haGanado = true;  // Marca como ganador
 		                        scoreFinal = puntuacion.getScore();  // Guarda el puntaje final
-		                        Herramientas.loop("BOOEEE.wav");		                    
+		                        Herramientas.play("BOOEEE.wav");
 		                        }
 						}
 					}
@@ -234,6 +234,7 @@ public class Juego extends InterfaceJuego {
 		            if (tortuga[j] != null && tortuga[j].chocoConFireball(fireballs)) {
 		            	tortuga[j] = null;
 		            	cantTortuga = cantTortuga + 1;
+		                Herramientas.play("ooof.wav"); // Reproduce el sonido solo una vez
 		            	if (cantTortuga == 4) {
 			            	haGanado = true;
 		            	}
@@ -267,7 +268,7 @@ public class Juego extends InterfaceJuego {
 					pep.caer();
 					if (pep.llegoFondo(entorno)) {
 						pep.morir(entorno);
-						Herramientas.loop("Super-Mario-Bros.wav");
+						Herramientas.play("Super-Mario-Bros.wav");
 					}
 				} else {
 					pep.dejarDeCaer();
@@ -287,11 +288,11 @@ public class Juego extends InterfaceJuego {
 
 					if (pep.chocoAlgunEnemigo(tortuga) && !pep.esInmortal()) {
 						pep.morir(entorno);
-						Herramientas.loop("Super-Mario-Bros.wav");
+						Herramientas.play("Super-Mario-Bros.wav");
 					}
 					if (pep.chocoConBomba(bomba) && !pep.esInmortal()) {
 						pep.morir(entorno);
-						Herramientas.loop("Super-Mario-Bros.wav");
+						Herramientas.play("Super-Mario-Bros.wav");
 					}
 				}
 				if (pep.estaSaltando()) {
