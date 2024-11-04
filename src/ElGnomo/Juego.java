@@ -203,7 +203,7 @@ public class Juego extends InterfaceJuego {
 							pep.activarInmortalidad();  // Activa inmortalidad
 							matarGnomo(i);  // Matar y rescatar ocasionan lo mismo por lo cual utilizamos el mismo metodo
 							puntos++;
-							if (puntos == 1) {
+							if (puntos == 10) {
 		                        haGanado = true;  // Marca como ganador
 		                        scoreFinal = puntuacion.getScore();  // Guarda el puntaje final
 		                        Herramientas.play("BOOEEE.wav");
@@ -237,6 +237,7 @@ public class Juego extends InterfaceJuego {
 		                Herramientas.play("ooof.wav"); // Reproduce el sonido solo una vez
 		            	if (cantTortuga == 4) {
 			            	haGanado = true;
+			            	Herramientas.play("BOOEEE.wav");
 		            	}
 		            	
 		            	for (int k = 0;k < fireballs.length;k++) {
