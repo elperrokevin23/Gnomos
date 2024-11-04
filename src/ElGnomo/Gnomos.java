@@ -11,16 +11,12 @@ public class Gnomos {
 	private double y;
 	private int ancho;
 	private int alto;
-	private Image imagenVivo;
 	private int puntos;
 	private double factorDesplazamiento;
 	private boolean vivo;
 	private Image imagen;
-	private Random random;
-	private long ultimoCambioDireccion; // Tiempo de la última inversión de dirección
 	private int gravedad;
 	private boolean cayendo;
-	private int direccion;
 	private boolean moviendoseALaDerecha;
 	private boolean estaEnIslaInferior;
 	
@@ -33,13 +29,10 @@ public class Gnomos {
 		this.alto = alto;
 		this.imagen = Herramientas.cargarImagen("gnomo.png");
 		this.puntos = 100;
-		this.random = new Random();
 		this.factorDesplazamiento = 1.0;
-	    this.ultimoCambioDireccion = System.currentTimeMillis(); 
 	    this.vivo = true;
 	    this.gravedad = 5;
 	    cayendo = false;
-	    this.direccion = 1;
 	    this.moviendoseALaDerecha = rand.nextBoolean(); // movimiento random del gnomo
 	    this.estaEnIslaInferior = false;
 	}
