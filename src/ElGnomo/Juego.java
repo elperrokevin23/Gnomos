@@ -186,10 +186,14 @@ public class Juego extends InterfaceJuego {
 							puntuacion.sumarGnomosPerdidos(1);
 							matarGnomo(i);
 						}
-						if (gnomo[i] != null && gnomo[i].chocoConBomba(bomba)) {
+						for (int r = 0;r < bomba.length;r++) {
+						if (gnomo[i] != null && bomba != null && gnomo[i].chocoConBomba(bomba[r])) {
 							puntuacion.sumarPuntos(-10);
 							puntuacion.sumarGnomosPerdidos(1);
 							matarGnomo(i);
+							bomba[r] = null;
+							break;
+						}
 						}
 
 						// Verifica si choca con el héroe (Pep)
@@ -199,7 +203,7 @@ public class Juego extends InterfaceJuego {
 							pep.activarInmortalidad();  // Activa inmortalidad
 							matarGnomo(i);  // Matar y rescatar ocasionan lo mismo por lo cual utilizamos el mismo metodo
 							puntos++;
-							if (puntos == 1) {
+							if (puntos == 10) {
 		                        haGanado = true;  // Marca como ganador
 		                        scoreFinal = puntuacion.getScore();  // Guarda el puntaje final
 		                        Herramientas.loop("BOOEEE.wav");		                    
@@ -207,7 +211,8 @@ public class Juego extends InterfaceJuego {
 						}
 					}
 				}
-			} else {
+			} 
+			else {
 				if (tiempoActual - tiempoUltimoGnomoSpawneado >= INTERVALO_SPAWN_GNOMO) {
 					gnomo[i] = new Gnomos(entorno.ancho()/2,(entorno.alto()/6)-40,10,10);
 					tiempoUltimoGnomoSpawneado = tiempoActual;
@@ -266,17 +271,17 @@ public class Juego extends InterfaceJuego {
 					}
 				} else {
 					pep.dejarDeCaer();
-					if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
+					if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA) || entorno.estaPresionada('a')) {
 						movimiento = MovimientoEstado.Izquierda;
 						pep.moverIzquierda(entorno);
 						pep.mirarIzquierda();
 					}
-					if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
+					if (entorno.estaPresionada(entorno.TECLA_DERECHA) || entorno.estaPresionada('d')) {
 						movimiento = MovimientoEstado.Derecha;
 						pep.moverDerecha(entorno);
 						pep.mirarDerecha();
 					}
-					if (entorno.estaPresionada(entorno.TECLA_ARRIBA)) {
+					if (entorno.estaPresionada(entorno.TECLA_ARRIBA) || entorno.estaPresionada(entorno.TECLA_ESPACIO)) {
 						pep.saltar();
 					}
 
