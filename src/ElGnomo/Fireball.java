@@ -7,7 +7,6 @@ import entorno.Entorno;
 public class Fireball {
     private double x;
     private double y;
-    private int angulo;
     private double velocidad; // velocidad de la bola de fuego
     private boolean moviendoDerecha; // dirección de movimiento
     private final int ancho = 20;  // Ancho de la fireball
