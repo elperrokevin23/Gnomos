@@ -1,6 +1,5 @@
 package ElGnomo;
 
-import java.awt.Color;
 import java.awt.Image;
 
 import entorno.Entorno;
@@ -9,7 +8,6 @@ import entorno.Herramientas;
 public class Bombas {
 	private double x;
     private double y;
-    private int angulo;
     private double velocidad; // velocidad de la bola de fuego
     private boolean moviendoDerecha; // dirección de movimiento
 	private Image imagen;
