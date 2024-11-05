@@ -29,21 +29,21 @@ public class Fireball {
     }
     public boolean chocoConBomba(Bombas bomba) {
 	        if (bomba != null && this != null) {
-	            // Coordenadas de los bordes de la bola de fuego
+	            // Coordenadas de los bordes de la bomba
 	            double bombaXIzquierda = bomba.getX() - 10;  // Coordenada del borde izquierdo de la bomba (10 es la mitad del ancho)
 	            double bombaXDerecha = bomba.getX() + 10;    // Coordenada del borde derecho de la bomba
 	            double bombaYSuperior = bomba.getY() - 10;   // Coordenada del borde superior de la bomba (10 es la mitad de la altura)
 	            double bombaYInferior = bomba.getY() + 10;   // Coordenada del borde inferior de la bomba
 
-	            // Coordenadas de los bordes de la tortuga
-	            double pepXIzquierda = this.getX() - this.getAncho() / 2;   // Coordenada del borde izquierdo de Pep (mitad de su ancho)
-	            double pepXDerecha = this.getX() + this.getAncho() / 2;     // Coordenada del borde derecho de Pep
-	            double pepYSuperior = this.getY() - this.getAlto() / 2;     // Coordenada del borde superior de Pep (mitad de su altura)
-	            double pepYInferior = this.getY() + this.getAlto() / 2;     // Coordenada del borde inferior de Pep
+	            // Coordenadas de los bordes de la bola de fuego
+	            double fireballXIzquierda = this.getX() - this.getAncho() / 2;   // Coordenada del borde izquierdo de Pep (mitad de su ancho)
+	            double fireballXDerecha = this.getX() + this.getAncho() / 2;     // Coordenada del borde derecho de Pep
+	            double fireballYSuperior = this.getY() - this.getAlto() / 2;     // Coordenada del borde superior de Pep (mitad de su altura)
+	            double fireballYInferior = this.getY() + this.getAlto() / 2;     // Coordenada del borde inferior de Pep
 
 	            // Verifica si hay colisión 
-	            if (bombaXIzquierda <= pepXDerecha && bombaXDerecha >= pepXIzquierda &&
-	                bombaYInferior >= pepYSuperior && bombaYSuperior <= pepYInferior) {
+	            if (bombaXIzquierda <= fireballXDerecha && bombaXDerecha >= fireballXIzquierda &&
+	                bombaYInferior >= fireballYSuperior && bombaYSuperior <= fireballYInferior) {
 	                return true;  // Colisión detectada
 	            }
 	        }
