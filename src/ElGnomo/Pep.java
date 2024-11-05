@@ -12,8 +12,8 @@ public class Pep {
 	private int ancho;
 	private int alto;
 	static boolean saltando = false; // Estado de salto de Pep.
-    private int anguloFireball; // Ángulo de lanzamiento de las bolas de fuego.
-    private ArrayList<Fireball> fireballs; // Lista de bolas de fuego lanzadas por Pep.
+        private int anguloFireball; // Ángulo de lanzamiento de las bolas de fuego.
+        private ArrayList<Fireball> fireballs; // Lista de bolas de fuego lanzadas por Pep.
 	private double factorDesplazamiento; // Factor de desplazamiento horizontal de Pep.
 	private double impulso; // Impulso de salto de Pep.
 	private double limiteDeSaltoY; // Altura máxima a la que puede saltar Pep.
