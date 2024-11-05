@@ -12,6 +12,7 @@ public class Bombas {
     private boolean moviendoDerecha; // dirección de movimiento
 	private Image imagen;
 
+
     public Bombas(double x, double y, boolean moviendoDerecha) {
         this.x = x;
         this.y = y;
