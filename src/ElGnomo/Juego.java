@@ -6,7 +6,6 @@ import entorno.Entorno;
 import entorno.InterfaceJuego;
 import entorno.Herramientas;
 import java.awt.Image;
-import java.io.File;
 import java.util.Random;
 
 import ElGnomo.Isla.IslaTipo;
@@ -24,7 +23,6 @@ public class Juego extends InterfaceJuego {
 	private Image fondo;
 	private Image fondoWin;
 	private Score puntuacion;
-	private int scoreFinal = 0;
 	private long ultimoDisparo = 0; // Tiempo del último disparo en milisegundos
 	private int puntos = 0;
 	private Fireball[] fireballs;
@@ -37,7 +35,6 @@ public class Juego extends InterfaceJuego {
 	private boolean haGanado;
 	private Bombas[] bomba;
 	private long tiempoUltimoGnomoSpawneado;
-	public int cantTortuga;
 
 	public Juego() {
 		int unAncho = 100;
@@ -45,7 +42,6 @@ public class Juego extends InterfaceJuego {
 		int tiempoCongelado = 200; 
 		haGanado = false;
 		fondoWin = Herramientas.cargarImagen("GANADOR.jpeg");
-		cantTortuga = 0;
 		
 
 		fondo = Herramientas.cargarImagen("fondo.jpg");
@@ -56,16 +52,22 @@ public class Juego extends InterfaceJuego {
 		imagenDeVigas = Herramientas.cargarImagen("pasto.png");
 		Casa = Herramientas.cargarImagen("casa.png");
 
-		islas = new Isla[15]; // Array para las 15 islas
+		// Crea un array para almacenar 15 objetos de tipo Isla
+		islas = new Isla[15];
+		// Define un array con las posiciones x de cada isla en el entorno, calculadas en función del ancho del entorno
 		int[] xxPos = {entorno.ancho() / 2,entorno.ancho() - 310,entorno.ancho() - 495,entorno.ancho() - 580,entorno.ancho() / 2,entorno.ancho() - 220,entorno.ancho() - 680,entorno.ancho() - 495,entorno.ancho() - 310,entorno.ancho() - 130,entorno.ancho() - 770,entorno.ancho() - 580,entorno.ancho() / 2,entorno.ancho() - 220,entorno.ancho() - 35};
+		// Define un array con las posiciones y de cada isla en el entorno, divididas en secciones del alto total del escenario
 		int[] yyPos = {ALTO_ESCENARIO / 6,(ALTO_ESCENARIO / 6) * 2,(ALTO_ESCENARIO / 6) * 2,(ALTO_ESCENARIO / 6) * 3,(ALTO_ESCENARIO / 6) * 3,(ALTO_ESCENARIO / 6) * 3,(ALTO_ESCENARIO / 6) * 4,(ALTO_ESCENARIO / 6) * 4,(ALTO_ESCENARIO / 6) * 4,(ALTO_ESCENARIO / 6) * 4,(ALTO_ESCENARIO / 6) * 5,(ALTO_ESCENARIO / 6) * 5,(ALTO_ESCENARIO / 6) * 5,(ALTO_ESCENARIO / 6) * 5,(ALTO_ESCENARIO / 6) * 5};
+		// Define un array de tipos IslaTipo para cada isla, asignando a cada posición un tipo (CasaGnomos, Superior o Inferior)
 		IslaTipo[] tipo = {IslaTipo.CasaGnomos,IslaTipo.Superior,IslaTipo.Superior,IslaTipo.Superior,IslaTipo.Superior,IslaTipo.Superior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior,IslaTipo.Inferior};
 		for (int p = 0; p < islas.length; p++) {
+			// Crea una nueva isla con las coordenadas x e y de xxPos y yyPos, con un ancho y alto dados, 
+		    // la imagen de vigas y asignando el tipo correspondiente
 			islas[p] = new Isla(xxPos[p], yyPos[p],unAncho,unAlto,imagenDeVigas,tipo[p]);
 		}
 		
-		pep = new Pep(entorno.ancho() -400, entorno.alto() -555, 20, 30,
-				3, true, tiempoCongelado);
+		pep = new Pep(entorno.ancho() -750, entorno.alto() -265, 20, 30,
+				4.5, true, tiempoCongelado);
 		gnomo = new Gnomos[4];
 		for (int i = 0;i < gnomo.length;i++) {
 			gnomo[i] = new Gnomos(entorno.ancho()/2,(entorno.alto()/6)-40,10,10);
@@ -150,7 +152,7 @@ public class Juego extends InterfaceJuego {
 	            }
 	        } 
 	        // Lógica para lanzar una nueva fireball si hay un espacio disponible
-	        else if (entorno.sePresiono('C')) { // Cambia 'C' por la tecla que desees
+	        else if (entorno.sePresiono('C') && pep.estaSobreAlgunaIsla(islas)) { // Cambia 'C' por la tecla que desees
 	            if (tiempoActual - ultimoDisparo >= 5000) {
 	            double xInicial = pep.getX(); // Centro en X
 	            double yInicial = pep.getY() + 10; // Centro en Y
@@ -205,7 +207,7 @@ public class Juego extends InterfaceJuego {
 							puntos++;
 							if (puntos == 10) {
 		                        haGanado = true;  // Marca como ganador
-		                        scoreFinal = puntuacion.getScore();  // Guarda el puntaje final
+		                        puntuacion.getScore();  // Guarda el puntaje final
 		                        Herramientas.play("BOOEEE.wav");
 		                        }
 						}
@@ -233,12 +235,7 @@ public class Juego extends InterfaceJuego {
 		            }
 		            if (tortuga[j] != null && tortuga[j].chocoConFireball(fireballs)) {
 		            	tortuga[j] = null;
-		            	cantTortuga = cantTortuga + 1;
 		                Herramientas.play("ooof.wav"); // Reproduce el sonido solo una vez
-		            	if (cantTortuga == 4) {
-			            	haGanado = true;
-			            	Herramientas.play("BOOEEE.wav");
-		            	}
 		            	
 		            	for (int k = 0;k < fireballs.length;k++) {
 		            		fireballs[k] = null;
@@ -274,14 +271,28 @@ public class Juego extends InterfaceJuego {
 				} else {
 					pep.dejarDeCaer();
 					if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA) || entorno.estaPresionada('a')) {
+						if (!pep.chocoIzquierda(entorno)) {
 						movimiento = MovimientoEstado.Izquierda;
 						pep.moverIzquierda(entorno);
 						pep.mirarIzquierda();
 					}
+						else {
+							movimiento = MovimientoEstado.Derecha;
+				            pep.moverDerecha(entorno);
+				            pep.mirarDerecha();
+						}
+					}
 					if (entorno.estaPresionada(entorno.TECLA_DERECHA) || entorno.estaPresionada('d')) {
+						if (!pep.chocoDerecha(entorno)) {
 						movimiento = MovimientoEstado.Derecha;
 						pep.moverDerecha(entorno);
 						pep.mirarDerecha();
+					}
+						else {
+							movimiento = MovimientoEstado.Izquierda;
+							pep.moverIzquierda(entorno);
+							pep.mirarIzquierda();
+						}
 					}
 					if (entorno.estaPresionada(entorno.TECLA_ARRIBA) || entorno.estaPresionada(entorno.TECLA_ESPACIO)) {
 						pep.saltar();
