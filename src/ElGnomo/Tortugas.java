@@ -3,14 +3,12 @@ package ElGnomo;
 import java.awt.Image;
 import entorno.Entorno;
 import entorno.Herramientas;
-import java.util.Random;
 
 public class Tortugas {
 	private double x;
 	private double y;
 	private int ancho;
 	private int alto;
-	private int puntos;
 	private double factorDesplazamiento;
 	private boolean vivo;
 	private Image imagenDerecha;
@@ -27,11 +25,10 @@ public class Tortugas {
 		this.alto = alto;
 		this.imagenDerecha = Herramientas.cargarImagen("tortuga.png");
 		this.imagenIzquierda = Herramientas.cargarImagen("tortuga3.png");
-		this.puntos = 100;
-		this.factorDesplazamiento = 2.3;
+		this.factorDesplazamiento = 1.8;
 	    this.vivo = true;
 	    this.gravedad = 5;
-	    cayendo = false;
+	    this.cayendo = false;
 	    this.moviendoseALaIzquierda = true; // Inicialmente moviéndose a la derecha
 	}
 
@@ -67,19 +64,6 @@ public void cambiarDireccion() {
 
 
 
-	public void abajo() {
-		y += factorDesplazamiento;
-	}
-
-	public boolean llegoFondo(Entorno e) {
-		return y > e.alto();
-	}
-
-	public void reSpawn() {
-		y = 0;
-	}
-
-
 	public boolean estaVivo() {
 		return vivo;
 	}
@@ -87,7 +71,7 @@ public void cambiarDireccion() {
 	public boolean estaSobreAlgunaIsla(Isla[] islas) {
 		for (int z = 0; z < islas.length; z++) {
 			if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2)
-					&& (x - +ancho / 2 <= islas[z].getX() + islas[z].getAncho()
+					&& (x - ancho / 2 <= islas[z].getX() + islas[z].getAncho()
 							/ 2)
 					&& (y + alto / 2 <= islas[z].getY() + islas[z].getAlto()
 							/ 2)
@@ -101,7 +85,7 @@ public void cambiarDireccion() {
 	public void cambiarDireccionSiTocaIsla(Isla[] islas) {
 		for (int z = 0; z < islas.length; z++) {
 			if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2)
-					&& (x - +ancho / 2 <= islas[z].getX() + islas[z].getAncho()
+					&& (x - ancho / 2 <= islas[z].getX() + islas[z].getAncho()
 							/ 2)
 					&& (y + alto / 2 <= islas[z].getY() + islas[z].getAlto()
 							/ 2)
@@ -111,17 +95,7 @@ public void cambiarDireccion() {
 			}
 		}
 	}
-	
 
-	public boolean chocoAlHeroe(Pep h) {
-		if ((x >= h.getX() - h.getAncho() / 2)
-				&& (x <= h.getX() + h.getAncho() / 2)
-				&& (y <= h.getY() + h.getAlto() / 2)
-				&& (y >= h.getY() - h.getAlto() / 2)) {
-			return true;
-		}
-		return false;
-	}
 	public long getUltimoDisparo() {
 	    return this.ultimoDisparo;
 	}
@@ -129,13 +103,6 @@ public void cambiarDireccion() {
 	    this.ultimoDisparo = tiempo;
 	}
 
-	public int getPuntos() {
-		return puntos;
-	}
-
-	public void morir() {
-		vivo = false;
-	}
 
 	public boolean chocoConFireball(Fireball[] fireballs) {
 	    for (Fireball fireball : fireballs) {
@@ -198,6 +165,9 @@ public void cambiarDireccion() {
 	public boolean chocoIzquierda(Entorno e) {
 		return x - ancho / 2 <= 0;
 	}
+	public boolean chocoDerecha(Entorno e) {
+		return x + ancho / 2 >= e.ancho();
+	}
 	public void moverEnIsla(Isla[] islas) {
 	    for (int z = 0; z < islas.length; z++) {
 	        // Verifica si la tortuga está sobre esta isla
@@ -221,12 +191,7 @@ public void cambiarDireccion() {
 	    }
 	}
 
-	public boolean chocoDerecha(Entorno e) {
-		return x + ancho / 2 >= e.ancho();
-	}
-	public boolean puedeDisparar(long tiempoActual, long intervaloDisparo) {
-	    return tiempoActual - this.ultimoDisparo >= intervaloDisparo;
-	}
+
 	public boolean izquierda() {
 		return this.moviendoseALaIzquierda;
 	}
