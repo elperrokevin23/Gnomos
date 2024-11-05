@@ -11,11 +11,11 @@ public class Score {
 	private long tiempoInicio;
 
 	public Score() {
-		puntos = 0;
-		gnomosPerdidos = 0;
-		gnomosSalvados = 0;
-		enemigosEliminados = 0;
-		tiempoInicio = System.currentTimeMillis();
+		this.puntos = 0;
+		this.gnomosPerdidos = 0;
+		this.gnomosSalvados = 0;
+		this.enemigosEliminados = 0;
+		this.tiempoInicio = System.currentTimeMillis();
 	}
 
 	public void sumarPuntos(int pun) {
