@@ -11,7 +11,6 @@ public class Gnomos {
 	private double y;
 	private int ancho;
 	private int alto;
-	private int puntos;
 	private double factorDesplazamiento;
 	private boolean vivo;
 	private Image imagen;
@@ -28,7 +27,6 @@ public class Gnomos {
 		this.ancho = ancho;
 		this.alto = alto;
 		this.imagen = Herramientas.cargarImagen("gnomo.png");
-		this.puntos = 100;
 		this.factorDesplazamiento = 1.0;
 	    this.vivo = true;
 	    this.gravedad = 5;
@@ -92,12 +90,12 @@ public void cambiarDireccion() {
 
 	public boolean estaSobreAlgunaIsla(Isla[] islas) {
 		for (int z = 0; z < islas.length; z++) {
-			if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2)
-					&& (x - +ancho / 2 <= islas[z].getX() + islas[z].getAncho()
+			if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2) //Verifica que el borde izquierdo del gnomo esté a la derecha o sobre el borde izquierdo de la isla
+					&& (x - +ancho / 2 <= islas[z].getX() + islas[z].getAncho() //Verifica que el borde derecho del gnomo esté a la izquierda o sobre el borde derecho de la isla
 							/ 2)
-					&& (y + alto / 2 <= islas[z].getY() + islas[z].getAlto()
+					&& (y + alto / 2 <= islas[z].getY() + islas[z].getAlto() // Verifica que la parte inferior del gnomo esté arriba o sobre el borde inferior de la isla
 							/ 2)
-					&& (y + alto / 2 >= islas[z].getY() - islas[z].getAlto()
+					&& (y + alto / 2 >= islas[z].getY() - islas[z].getAlto() //Verifica que la parte superior del gnomo esté abajo o sobre el borde superior de la isla
 							/ 2)) {
 				estaEnIslaInferior = islas[z].esIslaInferior();
 				return true;
@@ -115,47 +113,56 @@ public void cambiarDireccion() {
 	}
 
 	public boolean chocoAlHeroe(Pep h) {
-		if ((x >= h.getX() - h.getAncho() / 2)
-				&& (x <= h.getX() + h.getAncho() / 2)
-				&& (y <= h.getY() + h.getAlto() / 2)
-				&& (y >= h.getY() - h.getAlto() / 2)) {
+		if ((h != null) && this.estaVivo()) { 
+			// Coordenadas de los bordes de pep
+			double pepXIzquierda = h.getX() - 10;
+			double pepXDerecha = h.getX() + 10;
+			double pepYSuperior = h.getY() - 10;
+			double pepYInferior = h.getY() + 10;
+			
+			// Coordenadas de los bordes del gnomo
+			double gnomoXIzquierda = this.getX() - this.getAncho() / 2;
+            double gnomoXDerecha = this.getX() + this.getAncho() / 2;
+            double gnomoYSuperior = this.getY() - this.getAlto() / 2;
+            double gnomoYInferior = this.getY() + this.getAlto() / 2;
+            
+         // Verifica si hay colisión
+            if (pepXIzquierda <= gnomoXDerecha && pepXDerecha >= gnomoXIzquierda && pepYInferior >= gnomoYSuperior && pepYSuperior <= gnomoYInferior) {
 			return estaEnIslaInferior;
 		}
-		return false;
 	}
+	return false;
+}
 
-	public int getPuntos() {
-		return puntos;
-	}
 
 	public void morir() {
 		vivo = false;
 	}
 
 	public boolean fueChocadoPorUnEnemigo(Tortugas[] tortuga) {
-		for (Tortugas h : tortuga) {
-			if (this.estaVivo() && h != null
-					&& (x >= h.getX() - h.getAncho() / 2)
-					&& (x <= h.getX() + h.getAncho() / 2)
-					&& (y <= h.getY() + h.getAlto() / 2)
-					&& (y >= h.getY() - h.getAlto() / 2)) {
+		for (Tortugas tort : tortuga) {
+			if ( (tort != null) && this.estaVivo()) {
+				// Coordenadas de los bordes de las tortuga
+				double tortugaXIzquierda = tort.getX() - 10;
+				double tortugaXDerecha = tort.getX() + 10;
+				double tortugaYSuperior = tort.getY() - 10;
+				double tortugaYInferior = tort.getY() + 10;
+				
+				// Coordenadas de los bordes del gnomo
+				double gnomoXIzquierda = this.getX() - this.getAncho() / 2;
+	            double gnomoXDerecha = this.getX() + this.getAncho() / 2;
+	            double gnomoYSuperior = this.getY() - this.getAlto() / 2;
+	            double gnomoYInferior = this.getY() + this.getAlto() / 2;
+	            
+	         // Verifica si hay colisión
+	            if (tortugaXIzquierda <= gnomoXDerecha && tortugaXDerecha >= gnomoXIzquierda && tortugaYInferior >= gnomoYSuperior && tortugaYSuperior <= gnomoYInferior) {
 				return true;
 			}
 		}
-		return false;
-	}
-	public boolean chocoFireball(Fireball[] fireballs) {
-		for (int x = 0; x < fireballs.length; x++) {
-			if (fireballs[x] != null
-					&& fireballs[x].getX() <= this.x + this.ancho / 2
-					&& fireballs[x].getX() >= this.x - this.ancho / 2
-					&& (fireballs[x].getY() >= y - alto / 2 && fireballs[x].getY() <= y
-							+ alto / 2)) {
-				return true;
-			}
 		}
 		return false;
 	}
+	
 	public void caer() {		
 		if (vivo) {
 			y += gravedad;
