@@ -35,6 +35,7 @@ public class Juego extends InterfaceJuego {
 	private boolean haGanado;
 	private Bombas[] bomba;
 	private long tiempoUltimoGnomoSpawneado;
+	private int puntosPerdidos;
 
 	public Juego() {
 		int unAncho = 100;
@@ -42,6 +43,7 @@ public class Juego extends InterfaceJuego {
 		int tiempoCongelado = 200; 
 		haGanado = false;
 		fondoWin = Herramientas.cargarImagen("GANADOR.jpeg");
+		puntosPerdidos = 0;
 		
 
 		fondo = Herramientas.cargarImagen("fondo.jpg");
@@ -174,6 +176,11 @@ public class Juego extends InterfaceJuego {
 						matarGnomo(i);
 						puntuacion.sumarGnomosPerdidos(1);
 						puntuacion.sumarPuntos(-10);
+						puntosPerdidos++;
+						if (puntosPerdidos == 20) {
+							pep.morir(entorno);
+							Herramientas.play("Super-Mario-Bros.wav");
+						}
 					}
 				} else {
 					if (gnomo[i] != null && gnomo[i].estaVivo()) {  // Si está vivo, puede moverse y chequear colisiones
@@ -187,6 +194,11 @@ public class Juego extends InterfaceJuego {
 							puntuacion.sumarPuntos(-10);
 							puntuacion.sumarGnomosPerdidos(1);
 							matarGnomo(i);
+							puntosPerdidos++;
+							if (puntosPerdidos == 20) {
+								pep.morir(entorno);
+								Herramientas.play("Super-Mario-Bros.wav");
+							}
 						}
 						for (int r = 0;r < bomba.length;r++) {
 						if (gnomo[i] != null && bomba != null && gnomo[i].chocoConBomba(bomba[r])) {
@@ -194,7 +206,11 @@ public class Juego extends InterfaceJuego {
 							puntuacion.sumarGnomosPerdidos(1);
 							matarGnomo(i);
 							bomba[r] = null;
-							break;
+							puntosPerdidos++;
+							if (puntosPerdidos == 20) {
+								pep.morir(entorno);
+								Herramientas.play("Super-Mario-Bros.wav");
+							}
 						}
 						}
 
