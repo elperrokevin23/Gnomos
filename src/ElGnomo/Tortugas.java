@@ -51,15 +51,16 @@ public class Tortugas {
 	
 
 public void mover() {
+	 // Verifica si la tortuga se está moviendo a la izquierda
 	if (moviendoseALaIzquierda) {
-		x -= factorDesplazamiento;
+		x -= factorDesplazamiento; // Si es así, decrementa la posición x (se mueve a la izquierda)
 	}
 	else {
-		x += factorDesplazamiento;
+		x += factorDesplazamiento; // Caso contrario, incrementa la posición x (se mueve a la derecha)
 	}
 }
 public void cambiarDireccion() {
-	moviendoseALaIzquierda = !moviendoseALaIzquierda; // Invierte la dirección
+	moviendoseALaIzquierda = !moviendoseALaIzquierda; // Invierte el valor de moviendoseALaIzquierda
 }
 
 
@@ -81,19 +82,6 @@ public void cambiarDireccion() {
 			}
 		}
 		return false;
-	}
-	public void cambiarDireccionSiTocaIsla(Isla[] islas) {
-		for (int z = 0; z < islas.length; z++) {
-			if ((x + ancho / 2 >= islas[z].getX() - islas[z].getAncho() / 2)
-					&& (x - ancho / 2 <= islas[z].getX() + islas[z].getAncho()
-							/ 2)
-					&& (y + alto / 2 <= islas[z].getY() + islas[z].getAlto()
-							/ 2)
-					&& (y + alto / 2 >= islas[z].getY() - islas[z].getAlto()
-							/ 2)) {
-				 cambiarDireccion();
-			}
-		}
 	}
 
 	public long getUltimoDisparo() {
@@ -157,16 +145,18 @@ public void cambiarDireccion() {
 	}
 	public void caer() {
 		// y += factorDesplazamiento+impulso*3/2;
-		if (vivo) {
-			y += gravedad;
-			cayendo = true;
+		if (vivo) { // Solo cae si está viva
+			y += gravedad; // Incrementa la posición en y, simulando caída
+			cayendo = true; // Marca a la tortuga como en caída
 		}
 	}
+	// Verifica si la tortuga choca con el borde izquierdo del entorno
 	public boolean chocoIzquierda(Entorno e) {
-		return x - ancho / 2 <= 0;
+		return x - ancho / 2 <= 0; // Devuelve true si el borde izquierdo de la tortuga toca el límite izquierdo
 	}
+	// Verifica si la tortuga choca con el borde derecho del entorno
 	public boolean chocoDerecha(Entorno e) {
-		return x + ancho / 2 >= e.ancho();
+		return x + ancho / 2 >= e.ancho(); // Devuelve true si el borde derecho de la tortuga toca el límite derecho
 	}
 	public void moverEnIsla(Isla[] islas) {
 	    for (int z = 0; z < islas.length; z++) {
@@ -192,6 +182,7 @@ public void cambiarDireccion() {
 	}
 
 
+	// Retorna true si la tortuga se está moviendo a la izquierda
 	public boolean izquierda() {
 		return this.moviendoseALaIzquierda;
 	}
