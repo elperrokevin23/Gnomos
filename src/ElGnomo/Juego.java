@@ -286,31 +286,23 @@ public class Juego extends InterfaceJuego {
 					}
 				} else {
 					pep.dejarDeCaer();
-					if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA) || entorno.estaPresionada('a')) {
+					if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
 						if (!pep.chocoIzquierda(entorno)) {
 						movimiento = MovimientoEstado.Izquierda;
 						pep.moverIzquierda(entorno);
 						pep.mirarIzquierda();
 					}
-						else {
-							movimiento = MovimientoEstado.Derecha;
-				            pep.moverDerecha(entorno);
-				            pep.mirarDerecha();
-						}
+						
 					}
-					if (entorno.estaPresionada(entorno.TECLA_DERECHA) || entorno.estaPresionada('d')) {
+					if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
 						if (!pep.chocoDerecha(entorno)) {
 						movimiento = MovimientoEstado.Derecha;
 						pep.moverDerecha(entorno);
 						pep.mirarDerecha();
 					}
-						else {
-							movimiento = MovimientoEstado.Izquierda;
-							pep.moverIzquierda(entorno);
-							pep.mirarIzquierda();
-						}
+						
 					}
-					if (entorno.estaPresionada(entorno.TECLA_ARRIBA) || entorno.estaPresionada(entorno.TECLA_ESPACIO)) {
+					if (entorno.estaPresionada(entorno.TECLA_ARRIBA)) {
 						pep.saltar();
 					}
 
@@ -323,9 +315,15 @@ public class Juego extends InterfaceJuego {
 						Herramientas.play("Super-Mario-Bros.wav");
 					}
 				}
-				if (pep.estaSaltando()) {
-					pep.moverSalto(movimiento);
-				}} else {
+					if (pep.estaSaltando()) {
+						if (entorno.estaPresionada(entorno.TECLA_DERECHA))
+							movimiento = MovimientoEstado.Derecha;
+						}
+						if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
+							movimiento = MovimientoEstado.Izquierda;
+						}
+						pep.moverSalto(movimiento);
+				} else {
 					if (!juegoTerminado) {
 						juegoTerminado = true;
 						GameOverImage = Herramientas.cargarImagen("GameOver.gif");

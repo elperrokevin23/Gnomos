@@ -163,14 +163,18 @@ public class Pep {
 		if (vivo && saltando) {
 			if (getY() > limiteDeSaltoY)
 			{
-				// Aumenta la altura en el salto.
-				y -= gravedad + impulso;	
+				y -= gravedad + impulso;
+				x += movimientoSalto.getNumVal() * factorDesplazamiento * 0.5;		
 			}
 			else
 			{
 				saltando = false;
 				terminarSalto = true;
 			}
+		}
+		
+		if (estaCayendo() && terminarSalto) {
+			x += movimientoSalto.getNumVal() * factorDesplazamiento * 0.5;
 		}
 		else {
 			terminarSalto = false;
