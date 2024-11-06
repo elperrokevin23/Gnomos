@@ -12,8 +12,8 @@ public class Pep {
 	private int ancho;
 	private int alto;
 	static boolean saltando = false; // Estado de salto de Pep.
-        private int anguloFireball; // Ángulo de lanzamiento de las bolas de fuego.
-        private ArrayList<Fireball> fireballs; // Lista de bolas de fuego lanzadas por Pep.
+    private int anguloFireball; // Ángulo de lanzamiento de las bolas de fuego.
+    private ArrayList<Fireball> fireballs; // Lista de bolas de fuego lanzadas por Pep.
 	private double factorDesplazamiento; // Factor de desplazamiento horizontal de Pep.
 	private double impulso; // Impulso de salto de Pep.
 	private double limiteDeSaltoY; // Altura máxima a la que puede saltar Pep.
@@ -87,20 +87,6 @@ public class Pep {
         return this.inmortal;
     }
 	
-	public void activarEscudo() {
-		// Activa el escudo de Pep.
-		this.escudo = true;
-	}
-	
-	public boolean usaEscudo() {
-		// Retorna si Pep tiene el escudo activo.
-		return this.escudo;
-	}
-	
-	public void desactivarEscudo() {
-		// Desactiva el escudo de Pep.
-	    this.escudo = false;
-	}
 	
 	 // Dibuja a Pep en el entorno.
 	public void dibujar(Entorno e) {
