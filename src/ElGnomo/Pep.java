@@ -26,7 +26,6 @@ public class Pep {
 	private boolean terminarSalto; // Control para finalizar el salto.
 	private boolean inmortal; // Estado de inmortalidad de Pep.
 	private long tiempoInmortalInicio; // Tiempo de inicio de la inmortalidad.
-	private boolean escudo; // Indica si Pep tiene un escudo activo.
 	
 
 	public Pep(double x, double y, int ancho, int alto, double f,
@@ -40,14 +39,13 @@ public class Pep {
 		vivo = true;
         this.anguloFireball = 0;
         this.fireballs = new ArrayList<>();
-        this.imagenDerecha = Herramientas.cargarImagen("stepep.png");
-        this.imagenIzquierda = Herramientas.cargarImagen("stepe.png");
+        this.imagenDerecha = Herramientas.cargarImagen("pepDerecha.png");
+        this.imagenIzquierda = Herramientas.cargarImagen("pepIzquierda.png");
         this.impulso = 6.5;
         cayendo = false;
     	terminarSalto = false;
     	this.inmortal = false;
     	this.tiempoInmortalInicio = 0;
-    	this.escudo = false;
     	
 	}
 
@@ -163,18 +161,14 @@ public class Pep {
 		if (vivo && saltando) {
 			if (getY() > limiteDeSaltoY)
 			{
-				y -= gravedad + impulso;
-				x += movimientoSalto.getNumVal() * factorDesplazamiento * 0.5;		
+				// Aumenta la altura en el salto.
+				y -= gravedad + impulso;	
 			}
 			else
 			{
 				saltando = false;
 				terminarSalto = true;
 			}
-		}
-		
-		if (estaCayendo() && terminarSalto) {
-			x += movimientoSalto.getNumVal() * factorDesplazamiento * 0.5;
 		}
 		else {
 			terminarSalto = false;
