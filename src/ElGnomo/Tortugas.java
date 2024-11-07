@@ -23,8 +23,8 @@ public class Tortugas {
 		this.y = y;
 		this.ancho = ancho;
 		this.alto = alto;
-		this.imagenDerecha = Herramientas.cargarImagen("tortuga.png");
-		this.imagenIzquierda = Herramientas.cargarImagen("tortuga3.png");
+		this.imagenDerecha = Herramientas.cargarImagen("tortugaDerecha.png");
+		this.imagenIzquierda = Herramientas.cargarImagen("tortugaIzquierda.png");
 		this.factorDesplazamiento = 1.8;
 	    this.vivo = true;
 	    this.gravedad = 5;
