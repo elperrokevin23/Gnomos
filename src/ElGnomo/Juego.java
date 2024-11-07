@@ -69,7 +69,7 @@ public class Juego extends InterfaceJuego {
 		}
 		
 		pep = new Pep(entorno.ancho() -750, entorno.alto() -265, 20, 30,
-				4.5, true, tiempoCongelado);
+				6, true, tiempoCongelado);
 		gnomo = new Gnomos[4];
 		for (int i = 0;i < gnomo.length;i++) {
 			gnomo[i] = new Gnomos(entorno.ancho()/2,(entorno.alto()/6)-40,10,10);
@@ -81,7 +81,7 @@ public class Juego extends InterfaceJuego {
 		for (int i = 0; i < tortuga.length; i++) {
 		    tortuga[i] = new Tortugas(xPos[i], yPos,10,10);
 		}
-		casa = new Casa((entorno.ancho()/2)-5, (entorno.alto() / 6)-47, 40, 30);
+		casa = new Casa((entorno.ancho()/2)-5, (entorno.alto() / 6)-37, 40, 30);
 		fireballs = new Fireball[5];
 		bomba = new Bombas[5];
 		puntuacion = new Score();
@@ -286,23 +286,31 @@ public class Juego extends InterfaceJuego {
 					}
 				} else {
 					pep.dejarDeCaer();
-					if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
+					if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA) || entorno.estaPresionada('a')) {
 						if (!pep.chocoIzquierda(entorno)) {
 						movimiento = MovimientoEstado.Izquierda;
 						pep.moverIzquierda(entorno);
 						pep.mirarIzquierda();
 					}
-						
+						else {
+							movimiento = MovimientoEstado.Derecha;
+				            pep.moverDerecha(entorno);
+				            pep.mirarDerecha();
+						}
 					}
-					if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
+					if (entorno.estaPresionada(entorno.TECLA_DERECHA) || entorno.estaPresionada('d')) {
 						if (!pep.chocoDerecha(entorno)) {
 						movimiento = MovimientoEstado.Derecha;
 						pep.moverDerecha(entorno);
 						pep.mirarDerecha();
 					}
-						
+						else {
+							movimiento = MovimientoEstado.Izquierda;
+							pep.moverIzquierda(entorno);
+							pep.mirarIzquierda();
+						}
 					}
-					if (entorno.estaPresionada(entorno.TECLA_ARRIBA)) {
+					if (entorno.estaPresionada(entorno.TECLA_ARRIBA) || entorno.estaPresionada(entorno.TECLA_ESPACIO)) {
 						pep.saltar();
 					}
 
@@ -313,17 +321,14 @@ public class Juego extends InterfaceJuego {
 					if (pep.chocoConBomba(bomba) && !pep.esInmortal()) {
 						pep.morir(entorno);
 						Herramientas.play("Super-Mario-Bros.wav");
+						for (int u = 0; u < bomba.length;u++) {
+							bomba[u] = null;
+						}
 					}
 				}
-					if (pep.estaSaltando()) {
-						if (entorno.estaPresionada(entorno.TECLA_DERECHA))
-							movimiento = MovimientoEstado.Derecha;
-						}
-						if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
-							movimiento = MovimientoEstado.Izquierda;
-						}
-						pep.moverSalto(movimiento);
-				} else {
+				if (pep.estaSaltando()) {
+					pep.moverSalto(movimiento);
+				}} else {
 					if (!juegoTerminado) {
 						juegoTerminado = true;
 						GameOverImage = Herramientas.cargarImagen("GameOver.gif");
